@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigInteger;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.python.core.PyFunction;
@@ -26,9 +27,15 @@ public class urlService {
 		return Base64.encodeBase64(buffer, false);
 	}
 
-	public String fileToBinary(File file) {
+	public String binaryEnc(byte[] buffer) {
+		String binaryStr = new BigInteger(1, buffer).toString(2);
+		return binaryStr;
+	}
+
+	public byte[] fileTobase64(File file) {
 		String out = new String();
 		FileInputStream fis = null;
+		byte[] fileArray = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		try {
@@ -44,14 +51,9 @@ public class urlService {
 				baos.write(buf, 0, len);
 			}
 
-			byte[] fileArray = baos.toByteArray();
-			
-//			String str = new String(fileArray);
-//			System.out.println("file Array : " + fileArray.length);
-////			System.out.println("file Array : " + base64Enc(fileArray));
-////			System.out.println("file Array : " + str);
+			fileArray = baos.toByteArray();
 
-			out = new String(base64Enc(fileArray));
+//			out = new String(base64Enc(fileArray));
 
 			fis.close();
 			baos.close();
@@ -59,17 +61,23 @@ public class urlService {
 			System.out.println("Exception position : FileUtil - fileToString(File file)");
 		}
 
-		return out;
+//		return out;
+
+		return fileArray;
 	}
 
-	public void infoToBase64(String url_info, String file_loaction) throws IOException {
+	public info base64ToBinary(String url_info, String file_loaction) throws IOException {
 
 		File file = new File(file_loaction);
 //		 System.out.println("byte_encoding : " + fileToBinary(file));
+		
+		String binaryArray = binaryEnc(fileTobase64(file));
+		
 		info = new info();
 		info.setUrl_info(url_info);
 		info.setFile_location(file_loaction);
-		info.setByte_array(fileToBinary(file));
+		info.setBase64_array(new String(base64Enc(fileTobase64(file))));
+		info.setBinary_arry(binaryArray);
 
 		////////////////////////////
 		PythonInterpreter interpreter = new PythonInterpreter();
@@ -85,11 +93,7 @@ public class urlService {
 		PyObject pyObject = pyFunction.__call__(new PyInteger(a), new PyInteger(b));
 		System.out.println(pyObject.toString());
 
-		Base64ToBinary(info);
-	}
-	
-	public String Base64ToBinary(info info) {
-		
+		return info;
 	}
 
 }
