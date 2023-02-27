@@ -6,6 +6,7 @@ import org.python.core.PyFunction;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,8 @@ import lastcoder.service.urlService;
 @Controller
 public class mainController {
 	
-
+	@Autowired
+	private urlService urlService;
 	
 	@RequestMapping("/main")
 	@ResponseBody
@@ -42,25 +44,7 @@ public class mainController {
 	@ResponseBody
 	public String receiveURL(@RequestParam("url_info") String url_info, @RequestParam("file_location") String file_location) throws IOException {
 
-		urlService urlService = new urlService();
-		ModelAndView mv = new ModelAndView();
-		
-		
-		
-		PythonInterpreter interpreter = new PythonInterpreter();
-		interpreter.execfile("D:\\test.py");
-		interpreter.exec("print(testFunc(5,10))");
-		
-		PyFunction pyFunction = interpreter.get("testFunc", PyFunction.class);
-		
-		int a = 10;
-		int b = 20;
-		
-		PyObject pyObject = pyFunction.__call__(new PyInteger(a), new PyInteger(b));
-		System.out.println(pyObject.toString());
-		//test
-		return pyObject.toString() + urlService.infoAndBinary(url_info, file_location).toString();
-		
+		return urlService.infoAndBinary(url_info, file_location).toString();
 	}
 	
 	
