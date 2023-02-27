@@ -58,7 +58,7 @@ public class mainController {
 		
 		PyObject pyObject = pyFunction.__call__(new PyInteger(a), new PyInteger(b));
 		System.out.println(pyObject.toString());
-		
+		//test
 		return pyObject.toString() + urlService.infoAndBinary(url_info, file_location).toString();
 		
 	}
