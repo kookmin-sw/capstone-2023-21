@@ -10,7 +10,7 @@ public class CapstoneApplication {
 		SpringApplication.run(CapstoneApplication.class, args);
 		
 		
-		//Token : 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
+		//Token : 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
 	}
 
 }
