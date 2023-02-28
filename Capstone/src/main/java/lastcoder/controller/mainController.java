@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import lastcoder.model.info;
 import lastcoder.service.urlService;
 
-
 @Controller
 public class mainController {
 	
 	@Autowired
 	private urlService urlService;
+	
+
 	
 	@RequestMapping("/main")
 	@ResponseBody
@@ -39,7 +40,7 @@ public class mainController {
 	@ResponseBody
 	public info receiveURL(@RequestParam("url_info") String url_info, @RequestParam("file_location") String file_location) throws IOException {
 
-		return urlService.base64ToBinary(url_info, file_location);
+		return urlService.byteArrayToBinary(url_info, file_location);
 	}
 	
 	

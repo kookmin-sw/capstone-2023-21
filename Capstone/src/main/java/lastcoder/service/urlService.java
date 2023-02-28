@@ -23,16 +23,16 @@ public class urlService {
 	@Autowired
 	private info info;
 
-	public byte[] base64Enc(byte[] buffer) {
-		return Base64.encodeBase64(buffer, false);
+	public byte[] base64Enc(byte[] byteArray) {
+		return Base64.encodeBase64(byteArray, false);
 	}
 
-	public String binaryEnc(byte[] buffer) {
-		String binaryStr = new BigInteger(1, buffer).toString(2);
+	public String binaryEnc(byte[] byteArray) {
+		String binaryStr = new BigInteger(1, byteArray).toString(2);
 		return binaryStr;
 	}
 
-	public byte[] fileTobase64(File file) {
+	public byte[] fileToByteArray(File file) {
 		String out = new String();
 		FileInputStream fis = null;
 		byte[] fileArray = null;
@@ -62,24 +62,81 @@ public class urlService {
 		}
 
 //		return out;
-
 		return fileArray;
 	}
 
-	public info base64ToBinary(String url_info, String file_loaction) throws IOException {
+	public info byteArrayToBinary(String url_info, String file_loaction) throws IOException {
 
 		File file = new File(file_loaction);
 //		 System.out.println("byte_encoding : " + fileToBinary(file));
-		
-		String binaryArray = binaryEnc(fileTobase64(file));
-		
+
 		info = new info();
+
 		info.setUrl_info(url_info);
 		info.setFile_location(file_loaction);
-		info.setBase64_array(new String(base64Enc(fileTobase64(file))));
-		info.setBinary_arry(binaryArray);
 
-		////////////////////////////
+		info.setBase64_array(new String(base64Enc(fileToByteArray(file))));
+		info.setByteArray(fileToByteArray(file));
+
+		info.setBinary_array(binaryEnc(fileToByteArray(file)));
+
+		byteArrayToImage(info);
+
+		return info;
+	}
+
+	public void byteArrayToImage(info info) {
+
+		int[][] imageArray = new int[128][128];
+		String binaryArray = info.getBinary_array();
+		
+		int j, k = 0;
+		int tmp = -1;
+		System.out.println(binaryArray.length());
+
+		for(int i = 0; 14 <= binaryArray.length() - i ; i += 14){
+			System.out.println("i = " + i);
+			j = Byte.parseByte(binaryArray.substring(i, i + 7), 2);
+			k = Byte.parseByte(binaryArray.substring(i + 7, i + 14), 2);
+			
+//			0 6
+//			7 13
+//			
+//			14 20
+//			21 27
+//			
+//			28 
+//			
+//			42
+//			
+//			56
+//			
+//			70
+//			
+//			84
+//			
+//			98
+//			
+//			112 118
+//			119 125
+			
+			System.out.println(j +", " + k);
+			if (imageArray[j][k] <= 255) {
+				imageArray[j][k] += 1;
+			}
+			tmp = i;
+		}
+		System.out.println(binaryArray.length() - tmp);
+
+		info.setImageArray(imageArray);
+	}
+
+	
+
+	
+
+	public void pythonExec() {
+
 		PythonInterpreter interpreter = new PythonInterpreter();
 
 		interpreter.execfile("D:\\test.py");
@@ -92,8 +149,6 @@ public class urlService {
 
 		PyObject pyObject = pyFunction.__call__(new PyInteger(a), new PyInteger(b));
 		System.out.println(pyObject.toString());
-
-		return info;
 	}
 
 }

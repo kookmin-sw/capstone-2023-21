@@ -10,6 +10,10 @@ public class info {
 
 	private String url_info;
 	private String file_location;
+
 	private String base64_array;
-	private String binary_arry;
+	private byte[] byteArray;
+	
+	private String binary_array;
+	private int[][] imageArray;
 }
