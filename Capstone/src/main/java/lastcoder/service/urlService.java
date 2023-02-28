@@ -100,10 +100,8 @@ public class urlService {
 			k = Byte.parseByte(binaryArray.substring(i + 7, i + 14), 2);
 			 
 			System.out.println(j +", " + k);
-			if (imageArray[j][k] <= 255) {
+			if (imageArray[j][k] < 255) {
 				imageArray[j][k] += 1;
-			}else {
-				imageArray[j][k] = 255;
 			}
 			tmp = i;
 		}
