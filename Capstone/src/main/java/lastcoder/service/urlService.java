@@ -98,28 +98,7 @@ public class urlService {
 			System.out.println("i = " + i);
 			j = Byte.parseByte(binaryArray.substring(i, i + 7), 2);
 			k = Byte.parseByte(binaryArray.substring(i + 7, i + 14), 2);
-			
-//			0 6
-//			7 13
-//			
-//			14 20
-//			21 27
-//			
-//			28 
-//			
-//			42
-//			
-//			56
-//			
-//			70
-//			
-//			84
-//			
-//			98
-//			
-//			112 118
-//			119 125
-			
+			 
 			System.out.println(j +", " + k);
 			if (imageArray[j][k] <= 255) {
 				imageArray[j][k] += 1;
