@@ -1,7 +1,13 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package lastcoder.controller;
 
 import java.io.IOException;
-
+import lastcoder.model.info;
+import lastcoder.service.urlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import lastcoder.model.info;
 import lastcoder.service.urlService;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class mainController {
@@ -38,9 +45,9 @@ public class mainController {
 	
 	@PostMapping("/receive_URL")
 	@ResponseBody
-	public info receiveURL(@RequestParam("url_info") String url_info, @RequestParam("file_location") String file_location) throws IOException {
+	public info receiveURL(@RequestParam("multipartFile") MultipartFile multipartFile) throws IOException {
 
-		return urlService.byteArrayToBinary(url_info, file_location);
+		return urlService.byteArrayToBinary(multipartFile);
 	}
 	
 	

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lastcoder.model.info;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class urlService {
@@ -32,14 +33,14 @@ public class urlService {
 		return binaryStr;
 	}
 
-	public byte[] fileToByteArray(File file) {
+	public byte[] fileToByteArray(MultipartFile multipartFile) {
 		String out = new String();
 		FileInputStream fis = null;
 		byte[] fileArray = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		try {
-			fis = new FileInputStream(file);
+			fis = new FileInputStream((File)multipartFile);
 		} catch (FileNotFoundException e) {
 			System.out.println("Exception position : FileUtil - fileToString(File file)");
 		}
@@ -65,20 +66,21 @@ public class urlService {
 		return fileArray;
 	}
 
-	public info byteArrayToBinary(String url_info, String file_loaction) throws IOException {
+	public info byteArrayToBinary(MultipartFile multipartFile) throws IOException {
 
-		File file = new File(file_loaction);
+		//File file = new File(file_loaction);
 //		 System.out.println("byte_encoding : " + fileToBinary(file));
 
 		info = new info();
 
-		info.setUrl_info(url_info);
-		info.setFile_location(file_loaction);
+		//info.setUrl_info(url_info);
+		//info.setFile_location(file_loaction);
+		info.setMultipartFile(multipartFile);
 
-		info.setBase64_array(new String(base64Enc(fileToByteArray(file))));
-		info.setByteArray(fileToByteArray(file));
+		info.setBase64_array(new String(base64Enc(fileToByteArray(multipartFile))));
+		info.setByteArray(fileToByteArray(multipartFile));
 
-		info.setBinary_array(binaryEnc(fileToByteArray(file)));
+		info.setBinary_array(binaryEnc(fileToByteArray(multipartFile)));
 
 		byteArrayToImage(info);
 
