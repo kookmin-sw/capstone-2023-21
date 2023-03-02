@@ -33,14 +33,15 @@ public class urlService {
 		return binaryStr;
 	}
 
-	public byte[] fileToByteArray(MultipartFile multipartFile) {
+	public byte[] fileToByteArray(File file) {
 		String out = new String();
 		FileInputStream fis = null;
 		byte[] fileArray = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		try {
-			fis = new FileInputStream((File)multipartFile);
+			fis = new FileInputStream(file);
+
 		} catch (FileNotFoundException e) {
 			System.out.println("Exception position : FileUtil - fileToString(File file)");
 		}
@@ -66,21 +67,29 @@ public class urlService {
 		return fileArray;
 	}
 
+	public File multipartFileToFile(MultipartFile multipartFile) throws IOException {
+		File file = new File(multipartFile.getOriginalFilename());
+		multipartFile.transferTo(file);
+		return file;
+	}
+
 	public info byteArrayToBinary(MultipartFile multipartFile) throws IOException {
 
 		//File file = new File(file_loaction);
 //		 System.out.println("byte_encoding : " + fileToBinary(file));
-
 		info = new info();
 
 		//info.setUrl_info(url_info);
 		//info.setFile_location(file_loaction);
 		info.setMultipartFile(multipartFile);
+		File savefile = multipartFileToFile(multipartFile);
+		System.out.println("this is : " + savefile);
+		info.setFile(savefile);
 
-		info.setBase64_array(new String(base64Enc(fileToByteArray(multipartFile))));
-		info.setByteArray(fileToByteArray(multipartFile));
+		info.setBase64_array(new String(base64Enc(fileToByteArray(savefile))));
+		info.setByteArray(fileToByteArray(savefile));
 
-		info.setBinary_array(binaryEnc(fileToByteArray(multipartFile)));
+		info.setBinary_array(binaryEnc(fileToByteArray(savefile)));
 
 		byteArrayToImage(info);
 
