@@ -6,15 +6,97 @@
 
     <style>
 
+        @import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap');
+
         html{
-            height: 100%;
+            height: 110%;
         }
 
         body{
-            height: 100%;
+            height: 110%;
             margin: 0;
-            font-family: sans-serif;
+            padding: 0;
+
         }
+
+        .head{
+            display: flex;
+            height: 100px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo{
+            color: #0442BF;
+            font-size: 50px;
+        }
+
+        .main{
+            display: flex;
+            border: 1px solid #ECF4F4;
+            height: calc(110% - 100px - 400px);
+        }
+
+        .mainbackground{
+            font-family: sans-serif;
+            width: 80%;
+            height: 100%;
+            background-repeat: no-repeat;
+            background-image: url("https://media.istockphoto.com/id/906026812/ko/%EC%82%AC%EC%A7%84/%EB%AC%B8%EC%84%9C-%EA%B2%80%EC%83%89-%EC%A1%B0%EC%82%AC-%EB%B0%8F-%EB%B6%84%EC%84%9D.jpg?s=1024x1024&w=is&k=20&c=SGtaSMCSEdnd3Lql9ls_l33cSkiT3sjyEo92ZUt6tho=");
+            background-size: cover;
+            font-size: 3vw;
+            float: left;
+
+        }
+
+        .subbackground{
+            width: 20%;
+            height: 100%;
+            float: left;
+            transition: all 0.5s linear;
+        }
+
+        .subbackground:hover {
+            transform: rotateY( 180deg )
+        }
+
+        .waviy{
+            position: relative;
+            -webkit-box-reflect: below -20px linear-gradient(transparent, rgba(0,0,0,.2));
+            font-size: 3vw;
+        }
+        .waviy span{
+            position: relative;
+            display: inline-block;
+            animation: waviy 2s infinite;
+            animation-delay: calc(.1s * var(--i));
+        }
+        @keyframes waviy {
+            0%,40%,100% {
+                transform: translateY(0)
+            }
+            20% {
+                transform: translateY(-10px)
+            }
+        }
+
+        .foot{
+            display: flex;
+            height: 400px
+        }
+
+        .upload{
+            width: 100%;
+            height: 100%;
+            margin-top: 20px;
+        }
+
+        .titleName{
+            /* 레이블 크기만큼 width 배치 */
+            display: flex;
+            margin-left: 120px;
+        }
+
 
         /* 업로드된 파일과 전송버튼 */
         .fileContainer{
@@ -107,55 +189,52 @@
 
     <body>
 
-        <form th:action="@{/receive_URL}" method="post" enctype="multipart/form-data">
+        <div class="head">
+            <h1 class="logo">제목</h1>
+        </div>
 
-            <div class="fileContainer">
+        <div class="main" style="background-color: black">
+            <div class="mainbackground" style="background-color: #0442BF">
 
-                <div class="fileInput">
+                <div><span style="color: white; position: relative; top: 130px; left: 700px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #0442BF, 0 0 30px #0442BF, 0 0 40px #0442BF, 0 0 55px #0442BF, 0 0 75px #0442BF">Malware</span></div>
 
-                    <p>FILE NAME: </p>
-                    <p id="fileName"></p>
-
-                </div>
-
-                <div class="buttonContainer">
-
-                    <button type="submit">submit</button>
-
-                </div>
+                <div class="waviy"><span style="color: white; position: relative; top: 180px; left: 500px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #0442BF, 0 0 30px #0442BF, 0 0 40px #0442BF, 0 0 55px #0442BF, 0 0 75px #0442BF">
+                    <span style="--i:1">Distinction</span> <span style="--i:1">and</span> <span style="--i:1">Classification</span>
+                </span></div>
 
             </div>
+            <div class="subbackground" style="background-color: brown"></div>
+        </div>
 
-            <input type="file" id="multipartFile" th:name="multipartFile" accept="*" onchange="loadFile(this)">
+        <div class="foot">
+            <div class="upload">
+                <form th:action="@{/receive_URL}" method="post" enctype="multipart/form-data">
 
-            <div class="button">
-                <label for="multipartFile">
-                    파일 업로드
-                </label>
+                    <div class="fileContainer">
+
+                        <div class="fileInput">
+
+                            <p>FILE NAME: </p>
+                            <p id="fileName"></p>
+
+                        </div>
+
+                        <button type="submit" class="buttonContainer">submit</button>
+
+                    </div>
+
+                    <input type="file" id="multipartFile" th:name="multipartFile" accept="*" onchange="loadFile(this)">
+
+                    <div class="button">
+                        <label for="multipartFile">
+                            파일 업로드
+                        </label>
+                    </div>
+
+                </form>
             </div>
-
-        </form>
+        </div>
 
     </body>
 
-
-
-
-<!--<form th:action="@{/receive_URL}"  method="post" >
-    <table class="table">
-        <tbody>
-        <tr>
-            <td>URL</td>
-            <td><input type="text" th:name="url_info" ></td>
-        </tr>
-
-        <tr>
-            <td>File Location</td>
-            <td><input type="text" th:name="file_location" ></td>
-        </tr>
-        
-        </tbody>
-        <button type="submit">submit</button>
-    </table>
-    </form>-->
 </html>
