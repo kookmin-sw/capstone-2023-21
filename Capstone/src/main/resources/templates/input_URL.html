@@ -49,20 +49,46 @@
 
         }
 
+        img{
+            width: 100%;
+        }
         .subbackground{
+            background-color: black;
             display: flex;
             width: 20%;
             height: 100%;
             float: left;
-            perspective: 300px;
+            perspective: 1500px;
         }
 
         .subbackground .item{
-            width:100%;
+            width:99.6%;
+            border-left: black solid 1px;
             height: 100%;
-            border: 1px solid #828282;
             backface-visibility: hidden;
             transition: 1s;
+        }
+
+        .subbackground .item.front {
+            display: flex;
+            justify-content: center;
+            /* 앞면 카드가 부유하게 되어, 뒷면 카드가 아래에서 위로 올라감 -> 요소 두개가 겹치게 됨*/
+            position: absolute;
+            /* 명시적으로 기본값 설정, 없어도 됨*/
+            transform: rotateY(0deg);
+        }
+
+        .subbackground:hover .item.front {
+            transform: rotateY(180deg);
+        }
+
+        .subbackground .item.back {
+            /*y축을 중심으로 -180도 회전*/
+            transform: rotateY(-180deg);
+        }
+
+        .subbackground:hover .item.back {
+            transform: rotateY(0deg);
         }
 
 
@@ -211,8 +237,20 @@
 
             </div>
             <div class="subbackground">
-                <div class="item front">앞면</div>
-                <div class="item back">뒷면</div>
+                <div class="item front" style="background-color: #0442BF"><img src="https://media.istockphoto.com/id/1466091518/ko/%EB%B2%A1%ED%84%B0/%EB%85%B8%ED%8A%B8%EB%B6%81%EC%97%90-%ED%95%B4%EC%BB%A4-%EA%B2%BD%EA%B3%A0-%ED%95%B4%EC%BB%A4%EC%9D%98-%EC%9C%84%ED%98%91%EC%97%90-%EB%8C%80%ED%95%9C-%EA%B8%B4%EA%B8%89-%EA%B2%BD%EA%B3%A0-%EB%B0%94%EC%9D%B4%EB%9F%AC%EC%8A%A4-%EC%95%84%EC%9D%B4%EC%BD%98%EC%9D%B4-%EC%9E%88%EB%8A%94-%EB%A7%AC%EC%9B%A8%EC%96%B4-%EC%95%8C%EB%A6%BC%EC%9E%85%EB%8B%88%EB%8B%A4-%ED%95%B4%ED%82%B9-%EA%B0%9C%EB%85%90.jpg?s=2048x2048&w=is&k=20&c=PxyHJztDRNud_aXDScAIs4hPjcuoHH8xmeYZ8V_n1iA="></div>
+                <div class="item back" style="background-color: #4992BF; color white">
+                    <p>악성코드 종류</p>
+                    <br>
+                    <p>1. 바이러스</p>
+                    <p>2. 웜</p>
+                    <p>3. 트로이 목마</p>
+                    <p>4. 백도어</p>
+                    <p>5. 하이재커</p>
+                    <p>6. 스파이웨어</p>
+                    <p>7. 애드웨어</p>
+
+                    </p>
+                </div>
             </div>
         </div>
 
