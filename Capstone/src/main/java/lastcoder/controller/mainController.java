@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import lastcoder.model.info;
 import lastcoder.service.urlService;
 
 @Controller
 public class mainController {
+	
 	
 	@Autowired
 	private urlService urlService;
@@ -38,10 +40,9 @@ public class mainController {
 	
 	@PostMapping("/receive_URL")
 	@ResponseBody
-	public info receiveURL(@RequestParam("url_info") String url_info, @RequestParam("file_location") String file_location) throws IOException {
-
-		return urlService.byteArrayToBinary(url_info, file_location);
+	public info receiveURL(@RequestParam("multipartFile") MultipartFile multipartFile) throws IOException {
+		System.out.println(multipartFile);
+		return urlService.byteArrayToBinary(multipartFile);
 	}
-	
 	
 }
