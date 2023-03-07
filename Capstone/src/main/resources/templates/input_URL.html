@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title!</title>
+
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap');
+
+        html{
+            height: 110%;
+        }
+
+        body{
+            height: 110%;
+            margin: 0;
+            padding: 0;
+
+        }
+
+        .head{
+            display: flex;
+            height: 70px;
+            align-items: center;
+            background-color: #010A26;
+        }
+
+        .logo{
+            margin-left: 40px;
+            color: white;
+            font-size: 30px;
+        }
+
+        .main{
+            display: flex;
+            height: calc(110% - 70px - 400px);
+        }
+
+        .mainbackground{
+            font-family: sans-serif;
+            width: 80%;
+            height: 100%;
+            background-repeat: no-repeat;
+            background-image: url("https://media.istockphoto.com/id/906026812/ko/%EC%82%AC%EC%A7%84/%EB%AC%B8%EC%84%9C-%EA%B2%80%EC%83%89-%EC%A1%B0%EC%82%AC-%EB%B0%8F-%EB%B6%84%EC%84%9D.jpg?s=1024x1024&w=is&k=20&c=SGtaSMCSEdnd3Lql9ls_l33cSkiT3sjyEo92ZUt6tho=");
+            background-size: cover;
+            font-size: 3vw;
+            float: left;
+
+        }
+
+        img{
+            width: 100%;
+        }
+        .subbackground{
+            background-color: black;
+            display: flex;
+            width: 20%;
+            height: 100%;
+            float: left;
+            perspective: 1500px;
+        }
+
+        .subbackground .item{
+            width:99.6%;
+            border-left: black solid 1px;
+            height: 100%;
+            backface-visibility: hidden;
+            transition: 1s;
+        }
+
+        .subbackground .item.front {
+            display: flex;
+            justify-content: center;
+            /* 앞면 카드가 부유하게 되어, 뒷면 카드가 아래에서 위로 올라감 -> 요소 두개가 겹치게 됨*/
+            position: absolute;
+            /* 명시적으로 기본값 설정, 없어도 됨*/
+            transform: rotateY(0deg);
+        }
+
+        .subbackground:hover .item.front {
+            transform: rotateY(180deg);
+        }
+
+        .subbackground .item.back {
+            /*y축을 중심으로 -180도 회전*/
+            transform: rotateY(-180deg);
+        }
+
+        .subbackground:hover .item.back {
+            transform: rotateY(0deg);
+        }
+
+
+
+        .waviy{
+            position: relative;
+            -webkit-box-reflect: below -20px linear-gradient(transparent, rgba(0,0,0,.2));
+            font-size: 3vw;
+        }
+        .waviy span{
+            position: relative;
+            display: inline-block;
+            animation: waviy 2s infinite;
+            animation-delay: calc(.1s * var(--i));
+        }
+        @keyframes waviy {
+            0%,40%,100% {
+                transform: translateY(0)
+            }
+            20% {
+                transform: translateY(-10px)
+            }
+        }
+
+        .foot{
+            display: flex;
+            height: 400px
+        }
+
+        .upload{
+            width: 100%;
+            height: 100%;
+            margin-top: 20px;
+        }
+
+        .titleName{
+            /* 레이블 크기만큼 width 배치 */
+            display: flex;
+            margin-left: 120px;
+        }
+
+
+        /* 업로드된 파일과 전송버튼 */
+        .fileContainer{
+            /* 레이블 크기만큼 width 배치 */
+            display: flex;
+            /* 아이템들을 가운데 정렬 */
+            justify-content: center;
+            /* 수직축 가운데 정렬 */
+            align-items: center;
+        }
+
+        /* 업로드된 파일 */
+        .fileInput {
+            /* 레이블 크기만큼 width 배치 */
+            display: flex;
+            /* 수직축 가운데 정렬 */
+            align-items: center;
+            /* 밑줄 */
+            border-bottom: solid 2px black;
+            width: 60%;
+            height: 30px;
+        }
+
+        /* 업로드된 파일 */
+        #fileName {
+            /* 왼쪽 여백 */
+            margin-left: 5px;
+        }
+
+        /* 전송 버튼 */
+        .buttonContainer {
+            width: 15%;
+            /* 레이블 크기만큼 width 배치 */
+            display: flex;
+            /* 아이템들을 가운데 정렬 */
+            justify-content: center;
+            /* 수직축 가운데 정렬 */
+            align-items: center;
+            /* 왼쪽 여백 */
+            margin-left: 10px;
+            background-color: black;
+            color: white;
+            /* 테두리 */
+            border-radius: 30px;
+
+            padding: 10px;
+            /* 글꼴 크기 */
+            font-size: 0.8em;
+            /* 해당 레이블 위에 위치한 마우스 커서모양을 손가락으로 변경 */
+            cursor: pointer;
+        }
+
+        /* 파일 업로드 버튼 */
+        .button{
+            /* 레이블 크기만큼 width 배치 */
+            display:flex;
+            /* 아이템들을 가운데 정렬 */
+            justify-content: center;
+        }
+
+        /* 파일 업로드 버튼 */
+        label{
+            /* 해당 레이블 위에 위치한 마우스 커서모양을 손가락으로 변경 */
+            cursor: pointer;
+            /* 글꼴 크기 */
+            font-size: 1em;
+        }
+
+        /* input 숨기기 */
+        #multipartFile{
+            visibility: hidden;
+        }
+
+
+    </style>
+
+    <script>
+
+        /* 파일 업로드 스크립트 */
+        function loadFile(input){
+            var file = input.files[0];
+            var name = document.getElementById('fileName');
+            name.textContent = file.name;
+        }
+
+
+    </script>
+
+</head>
+
+    <body>
+
+        <div class="head">
+            <h1 class="logo">제목</h1>
+        </div>
+
+        <div class="main">
+            <div class="mainbackground" style="background-color: #0442BF">
+
+                <div><span style="color: white; position: relative; top: 130px; left: 700px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #0442BF, 0 0 30px #0442BF, 0 0 40px #0442BF, 0 0 55px #0442BF, 0 0 75px #0442BF">Malware</span></div>
+
+                <div class="waviy"><span style="color: white; position: relative; top: 180px; left: 500px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #0442BF, 0 0 30px #0442BF, 0 0 40px #0442BF, 0 0 55px #0442BF, 0 0 75px #0442BF">
+                    <span style="--i:1">Distinction</span> <span style="--i:1">and</span> <span style="--i:1">Classification</span>
+                </span></div>
+
+            </div>
+            <div class="subbackground">
+                <div class="item front" style="background-color: #0442BF"><img src="https://media.istockphoto.com/id/1466091518/ko/%EB%B2%A1%ED%84%B0/%EB%85%B8%ED%8A%B8%EB%B6%81%EC%97%90-%ED%95%B4%EC%BB%A4-%EA%B2%BD%EA%B3%A0-%ED%95%B4%EC%BB%A4%EC%9D%98-%EC%9C%84%ED%98%91%EC%97%90-%EB%8C%80%ED%95%9C-%EA%B8%B4%EA%B8%89-%EA%B2%BD%EA%B3%A0-%EB%B0%94%EC%9D%B4%EB%9F%AC%EC%8A%A4-%EC%95%84%EC%9D%B4%EC%BD%98%EC%9D%B4-%EC%9E%88%EB%8A%94-%EB%A7%AC%EC%9B%A8%EC%96%B4-%EC%95%8C%EB%A6%BC%EC%9E%85%EB%8B%88%EB%8B%A4-%ED%95%B4%ED%82%B9-%EA%B0%9C%EB%85%90.jpg?s=2048x2048&w=is&k=20&c=PxyHJztDRNud_aXDScAIs4hPjcuoHH8xmeYZ8V_n1iA="></div>
+                <div class="item back" style="background-color: #4992BF; color white">
+                    <p>악성코드 종류</p>
+                    <br>
+                    <p>1. 바이러스</p>
+                    <p>2. 웜</p>
+                    <p>3. 트로이 목마</p>
+                    <p>4. 백도어</p>
+                    <p>5. 하이재커</p>
+                    <p>6. 스파이웨어</p>
+                    <p>7. 애드웨어</p>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="foot">
+            <div class="upload">
+                <form th:action="@{/receive_URL}" method="post" enctype="multipart/form-data">
+
+                    <div class="fileContainer">
+
+                        <div class="fileInput">
+
+                            <p>FILE NAME: </p>
+                            <p id="fileName"></p>
+
+                        </div>
+
+                        <button type="submit" class="buttonContainer">submit</button>
+
+                    </div>
+
+                    <input type="file" id="multipartFile" th:name="multipartFile" accept="*" onchange="loadFile(this)">
+
+                    <div class="button">
+                        <label for="multipartFile">
+                            파일 업로드
+                        </label>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </body>
+
+</html>
