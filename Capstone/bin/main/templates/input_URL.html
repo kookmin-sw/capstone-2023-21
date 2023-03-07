@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+
+<form th:action="@{/receive_URL}"  method="post" >
+    <table class="table">
+        <tbody>
+        <tr>
+            <td>URL</td>
+            <td><input type="text" th:name="url_info" ></td>
+        </tr>
+
+        <tr>
+            <td>File Location</td>
+            <td><input type="text" th:name="file_location" ></td>
+        </tr>
+        
+        </tbody>
+        <button type="submit">submit</button>
+    </table>
+    </form>
+
+</html>

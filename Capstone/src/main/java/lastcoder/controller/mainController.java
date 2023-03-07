@@ -43,6 +43,7 @@ public class mainController {
 	@ResponseBody
 	public info receiveURL(@RequestParam("multipartFile") MultipartFile multipartFile) throws IOException {
 		//test2
+
 		return urlService.byteArrayToBinary(multipartFile);
 	}
 	
