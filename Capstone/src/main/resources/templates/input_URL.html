@@ -21,20 +21,20 @@
 
         .head{
             display: flex;
-            height: 100px;
-            justify-content: center;
+            height: 70px;
             align-items: center;
+            background-color: #010A26;
         }
 
         .logo{
-            color: #0442BF;
-            font-size: 50px;
+            margin-left: 40px;
+            color: white;
+            font-size: 30px;
         }
 
         .main{
             display: flex;
-            border: 1px solid #ECF4F4;
-            height: calc(110% - 100px - 400px);
+            height: calc(110% - 70px - 400px);
         }
 
         .mainbackground{
@@ -50,15 +50,22 @@
         }
 
         .subbackground{
+            display: flex;
             width: 20%;
             height: 100%;
             float: left;
-            transition: all 0.5s linear;
+            perspective: 300px;
         }
 
-        .subbackground:hover {
-            transform: rotateY( 180deg )
+        .subbackground .item{
+            width:100%;
+            height: 100%;
+            border: 1px solid #828282;
+            backface-visibility: hidden;
+            transition: 1s;
         }
+
+
 
         .waviy{
             position: relative;
@@ -193,7 +200,7 @@
             <h1 class="logo">제목</h1>
         </div>
 
-        <div class="main" style="background-color: black">
+        <div class="main">
             <div class="mainbackground" style="background-color: #0442BF">
 
                 <div><span style="color: white; position: relative; top: 130px; left: 700px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #0442BF, 0 0 30px #0442BF, 0 0 40px #0442BF, 0 0 55px #0442BF, 0 0 75px #0442BF">Malware</span></div>
@@ -203,7 +210,10 @@
                 </span></div>
 
             </div>
-            <div class="subbackground" style="background-color: brown"></div>
+            <div class="subbackground">
+                <div class="item front">앞면</div>
+                <div class="item back">뒷면</div>
+            </div>
         </div>
 
         <div class="foot">
