@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.python.core.PyFunction;
@@ -73,23 +74,27 @@ public class urlService {
 		return file;
 	}
 
-	public info byteArrayToBinary(MultipartFile multipartFile) throws IOException {
+	public info byteArrayToBinary(List<MultipartFile> list) throws IOException {
 
 		//File file = new File(file_loaction);
 //		 System.out.println("byte_encoding : " + fileToBinary(file));
 		info = new info();
+		info.setMFlist(list);
+		File savefile;
+		for(int i=0; i < list.size(); i++){
+			info.setMultipartFile(list.get(i));
+			savefile = multipartFileToFile(list.get(i));
+			System.out.println("this is : " + savefile);
+			info.setFile(savefile);
 
+			//info.setBase64_array(new String(base64Enc(fileToByteArray(savefile))));
+			//info.setByteArray(fileToByteArray(savefile));
+
+			//info.setBinary_array(binaryEnc(fileToByteArray(savefile)));
+		}
 		//info.setUrl_info(url_info);
 		//info.setFile_location(file_loaction);
-		info.setMultipartFile(multipartFile);
-		File savefile = multipartFileToFile(multipartFile);
-		System.out.println("this is : " + savefile);
-		info.setFile(savefile);
 
-		info.setBase64_array(new String(base64Enc(fileToByteArray(savefile))));
-		info.setByteArray(fileToByteArray(savefile));
-
-		info.setBinary_array(binaryEnc(fileToByteArray(savefile)));
 
 		byteArrayToImage(info);
 
