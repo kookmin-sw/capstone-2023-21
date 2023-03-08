@@ -6,6 +6,8 @@
 package lastcoder.controller;
 
 import java.io.IOException;
+import java.util.List;
+
 import lastcoder.model.info;
 import lastcoder.service.urlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import lastcoder.model.info;
 import lastcoder.service.urlService;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Controller
 public class mainController {
@@ -45,9 +48,12 @@ public class mainController {
 	
 	@PostMapping("/receive_URL")
 	@ResponseBody
-	public info receiveURL(@RequestParam("multipartFile") MultipartFile multipartFile) throws IOException {
-		System.out.println(multipartFile);
-		return urlService.byteArrayToBinary(multipartFile);
+	public info receiveURL(MultipartHttpServletRequest multipartFile) throws IOException {
+		List<MultipartFile> list = multipartFile.getFiles("multipartFile");
+		for(int i =0; i< list.size(); i++){
+			System.out.println(list.get(i));
+		}
+		return urlService.byteArrayToBinary(list);
 	}
 	
 	
