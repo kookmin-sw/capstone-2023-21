@@ -5,7 +5,9 @@
 
 package lastcoder.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import lastcoder.model.info;
@@ -49,11 +51,27 @@ public class mainController {
 	@PostMapping("/receive_URL")
 	@ResponseBody
 	public info receiveURL(MultipartHttpServletRequest multipartFile) throws IOException {
-		List<MultipartFile> list = multipartFile.getFiles("multipartFile");
-		for(int i =0; i< list.size(); i++){
-			System.out.println(list.get(i));
+
+		List<MultipartFile> fileinputlist = multipartFile.getFiles("multipartFile");
+		List<File> PEfile = new ArrayList<File>();
+
+		for(int i =0; i< fileinputlist.size(); i++){
+
+			System.out.println(fileinputlist.get(i));
+
+			File savefile = urlService.multipartFileToFile(fileinputlist.get(i));
+			String filename = savefile.toString();
+			System.out.println("this is : " + filename);
+
+			String[] extension = filename.split("\\.");
+			System.out.println(extension[extension.length-1]);
+
+			if(extension[extension.length-1].equals("exe") || extension[extension.length-1].equals("src") || extension[extension.length-1].equals("dll") || extension[extension.length-1].equals("ocx") || extension[extension.length-1].equals("cpl") || extension[extension.length-1].equals("drv") || extension[extension.length-1].equals("sys") || extension[extension.length-1].equals("vxd") || extension[extension.length-1].equals("obj")){
+				PEfile.add(savefile);
+			}
 		}
-		return urlService.byteArrayToBinary(list);
+
+		return urlService.byteArrayToBinary(PEfile);
 	}
 	
 	

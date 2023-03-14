@@ -74,24 +74,20 @@ public class urlService {
 		return file;
 	}
 
-	public info byteArrayToBinary(List<MultipartFile> list) throws IOException {
+	public info byteArrayToBinary(List<File> list) throws IOException {
 
 		//File file = new File(file_loaction);
 //		 System.out.println("byte_encoding : " + fileToBinary(file));
 		info = new info();
-		info.setMFlist(list);
+		info.setFlist(list);
 		File savefile;
-		for(int i=0; i < list.size(); i++){
-			info.setMultipartFile(list.get(i));
-			savefile = multipartFileToFile(list.get(i));
-			System.out.println("this is : " + savefile);
-			info.setFile(savefile);
-
+		//for(int i=0; i < list.size(); i++){
+		//	savefile = list.get(i);
 			//info.setBase64_array(new String(base64Enc(fileToByteArray(savefile))));
 			//info.setByteArray(fileToByteArray(savefile));
 
 			//info.setBinary_array(binaryEnc(fileToByteArray(savefile)));
-		}
+		//}
 		//info.setUrl_info(url_info);
 		//info.setFile_location(file_loaction);
 

@@ -17,7 +17,7 @@ public class info {
 	private MultipartFile multipartFile;
 	private File file;
 
-	private List<MultipartFile> MFlist;
+	private List<File> Flist;
 
 	private String base64_array;
 	private byte[] byteArray;
