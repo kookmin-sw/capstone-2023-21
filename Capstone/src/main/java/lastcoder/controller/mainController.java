@@ -27,12 +27,12 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Controller
 public class mainController {
-	
+
 	@Autowired
 	private urlService urlService;
-	
 
-	
+
+
 	@RequestMapping("/main")
 	@ResponseBody
 	public String hello() {
@@ -54,21 +54,29 @@ public class mainController {
 
 		List<MultipartFile> fileinputlist = multipartFile.getFiles("multipartFile");
 		List<File> PEfile = new ArrayList<File>();
+		String filePath = "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\quarantine";
 
 		for(int i =0; i< fileinputlist.size(); i++){
 
-			System.out.println(fileinputlist.get(i));
+			String fileRealName = fileinputlist.get(i).getOriginalFilename();
+			System.out.println(fileRealName);
+			File saveFile = new File(filePath + File.separator + fileRealName);
 
-			File savefile = urlService.multipartFileToFile(fileinputlist.get(i));
-			String filename = savefile.toString();
-			System.out.println("this is : " + filename);
 
-			String[] extension = filename.split("\\.");
+			String[] extension = fileRealName.split("\\.");
 			System.out.println(extension[extension.length-1]);
-
 			if(extension[extension.length-1].equals("exe") || extension[extension.length-1].equals("src") || extension[extension.length-1].equals("dll") || extension[extension.length-1].equals("ocx") || extension[extension.length-1].equals("cpl") || extension[extension.length-1].equals("drv") || extension[extension.length-1].equals("sys") || extension[extension.length-1].equals("vxd") || extension[extension.length-1].equals("obj")){
-				PEfile.add(savefile);
+				PEfile.add(saveFile);
 			}
+
+			try{
+				fileinputlist.get(i).transferTo(saveFile);
+			}catch (IllegalStateException e){
+				e.printStackTrace();
+			}catch (IOException e){
+				e.printStackTrace();
+			}
+
 		}
 
 		return urlService.byteArrayToBinary(PEfile);
