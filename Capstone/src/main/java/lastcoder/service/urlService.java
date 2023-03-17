@@ -34,14 +34,16 @@ public class urlService {
 		return binaryStr;
 	}
 
-	public byte[] fileToByteArray(File file) {
+	public byte[] fileToByteArray(String location) {
 		String out = new String();
 		FileInputStream fis = null;
 		byte[] fileArray = null;
+		System.out.println(location);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		try {
-			fis = new FileInputStream(file);
+			fis = new FileInputStream(location);
+			System.out.println(fis);
 
 		} catch (FileNotFoundException e) {
 			System.out.println("Exception position : FileUtil - fileToString(File file)");
@@ -76,23 +78,25 @@ public class urlService {
 
 	public info byteArrayToBinary(List<File> list) throws IOException {
 
+		String location = "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\quarantine";
 		//File file = new File(file_loaction);
 //		 System.out.println("byte_encoding : " + fileToBinary(file));
 		info = new info();
 		info.setFlist(list);
-		File savefile;
-		//for(int i=0; i < list.size(); i++){
-		//	savefile = list.get(i);
-			//info.setBase64_array(new String(base64Enc(fileToByteArray(savefile))));
-			//info.setByteArray(fileToByteArray(savefile));
 
-			//info.setBinary_array(binaryEnc(fileToByteArray(savefile)));
-		//}
+		for(int i=0; i < list.size(); i++){
+			String filelocation = list.get(i).toString();
+			info.setBase64_array(new String(base64Enc(fileToByteArray(filelocation))));
+			info.setByteArray(fileToByteArray(filelocation));
+			info.setBinary_array(binaryEnc(fileToByteArray(filelocation)));
+		}
+
+
 		//info.setUrl_info(url_info);
 		//info.setFile_location(file_loaction);
 
 
-		byteArrayToImage(info);
+		//byteArrayToImage(info);
 
 		return info;
 	}
