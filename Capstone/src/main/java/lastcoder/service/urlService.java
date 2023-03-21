@@ -85,10 +85,67 @@ public class urlService {
 		info.setFlist(list);
 
 		for(int i=0; i < list.size(); i++){
+
 			String filelocation = list.get(i).toString();
-			info.setBase64_array(new String(base64Enc(fileToByteArray(filelocation))));
-			info.setByteArray(fileToByteArray(filelocation));
-			info.setBinary_array(binaryEnc(fileToByteArray(filelocation)));
+			//info.setBase64_array(new String(base64Enc(fileToByteArray(filelocation))));
+			//info.setByteArray(fileToByteArray(filelocation));
+			info.setBinary_array("0" + binaryEnc(fileToByteArray(filelocation)));
+			String binaryfile = info.getBinary_array();
+			String hxdresult = "";
+			String hxd = "";
+			int count = 0;
+			int space = 0;
+
+			for (int j = 1; j <= binaryfile.length(); j++){
+
+				hxd = hxd + binaryfile.charAt(j-1);
+				count++;
+
+				if(count == 4){
+					int binaryToHex = Integer.parseInt(hxd,2);
+					String hexString = Integer.toHexString(binaryToHex);
+					hxdresult = hxdresult + hexString;
+					hxd = "";
+					space++;
+					count = 0;
+				}
+
+				if(space == 2){
+					hxdresult = hxdresult + " ";
+					space = 0;
+				}
+
+			}
+
+			info.setHex_array(hxdresult);
+
+			// 이중배열로 파일 16진수 데이터로 출력
+			String hexarray[] = hxdresult.split(" ");
+			System.out.println("배열크기 : " + hxdresult.split(" ").length);
+			System.out.println("마지막 값 : " + hexarray[hexarray.length-1]);
+			String hxdarray[][] = new String[hexarray.length/16][16];
+
+			for(int row = 0; row < hxdarray.length; row++){
+				for(int col = 0; col < hxdarray[row].length; col++){
+					hxdarray[row][col] = hexarray[row*16 + col];
+				}
+			}
+
+			for(int row = 0; row < hxdarray.length; row++){
+				for(int col = 0; col < hxdarray[row].length; col++){
+					System.out.print(hxdarray[row][col] + " ");
+				}
+				System.out.println();
+			}
+
+
+
+			// Image_dos_header
+
+			// e_magic 2byte로 "MZ" PE파일 확인
+			boolean PEcheck = false;
+
+
 		}
 
 

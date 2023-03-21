@@ -25,4 +25,6 @@ public class info {
 	private String binary_array;
 	private int[][] imageArray;
 
+	private String hex_array;
+
 }
