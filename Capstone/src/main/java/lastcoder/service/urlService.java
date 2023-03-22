@@ -89,6 +89,8 @@ public class urlService {
 			String filelocation = list.get(i).toString();
 			//info.setBase64_array(new String(base64Enc(fileToByteArray(filelocation))));
 			//info.setByteArray(fileToByteArray(filelocation));
+
+			// 파일 바이너리화 & 16진수 데이터형 변환
 			info.setBinary_array("0" + binaryEnc(fileToByteArray(filelocation)));
 			String binaryfile = info.getBinary_array();
 			String hxdresult = "";
@@ -144,7 +146,60 @@ public class urlService {
 
 			// e_magic 2byte로 "MZ" PE파일 확인
 			boolean PEcheck = false;
+			String mz = "";
+			for(int index = 0; index < 2; index++){
+				String component = hxdarray[0][index];
+				int decimal = Integer.parseInt(component, 16);
+				char c = (char)decimal;
+				mz = mz + c;
+			}
 
+			if(mz.equals("MZ")){
+				PEcheck = true;
+				System.out.println(PEcheck + " PE 파일 입니다.");
+			}
+			else{
+				System.out.println(PEcheck + " PE파일이 아님 " + mz);
+			}
+
+			// e_lfanew로 IMAGE_NT_HEADERS 위치 찾기
+			String INH_location = "";
+			for(int index = 1; index <= 4; index++){
+				String component = hxdarray[64/16-1][16-index];
+				INH_location = INH_location + component;
+			}
+			System.out.println(INH_location);
+			int INH_location_index = Integer.parseInt(INH_location,16);
+
+			int row = INH_location_index/16;
+			int col = INH_location_index%16;
+
+			System.out.println("행 : " + row + " " + "열 : " + col);
+
+			//IMAGE_NT_HEADERS 위치 확인
+			boolean checkINH = false;
+			String checkINH_location = "";
+			int increase = 0;
+			int INH_row = row;
+			int INH_col = col;
+			for(int index = 0; index < 4; index++){
+				INH_col = INH_col + increase;
+				if(INH_col >= 16){
+					INH_col = INH_col-16;
+					INH_row = INH_row+1;
+				}
+				checkINH_location = checkINH_location + hxdarray[INH_row][INH_col];
+				if(increase < 1){
+					increase++;
+				}
+			}
+			System.out.println(checkINH_location);
+			if(checkINH_location.equals("50450000")){
+				checkINH = true;
+			}
+			System.out.println(checkINH + " " + "INH 시작위치입니다.");
+
+			System.out.println(INH_location_index);
 
 		}
 
