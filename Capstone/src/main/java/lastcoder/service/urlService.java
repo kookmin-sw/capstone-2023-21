@@ -92,11 +92,13 @@ public class urlService {
 
 			// 파일 바이너리화 & 16진수 데이터형 변환
 			info.setBinary_array("0" + binaryEnc(fileToByteArray(filelocation)));
+			System.out.println("여기 살고 있니");
 			String binaryfile = info.getBinary_array();
 			String hxdresult = "";
 			String hxd = "";
 			int count = 0;
 			int space = 0;
+			System.out.println(binaryfile.length());
 
 			for (int j = 1; j <= binaryfile.length(); j++){
 
@@ -116,7 +118,7 @@ public class urlService {
 					hxdresult = hxdresult + " ";
 					space = 0;
 				}
-
+				System.out.println(j);
 			}
 
 			info.setHex_array(hxdresult);
@@ -198,8 +200,80 @@ public class urlService {
 				checkINH = true;
 			}
 			System.out.println(checkINH + " " + "INH 시작위치입니다.");
-
 			System.out.println(INH_location_index);
+
+			// INH_location_index 끝위치
+			int INH_finish_location_index = INH_location_index + 3;
+
+			// PE파일 섹션 개수
+			int numberOfSection_location = INH_finish_location_index + 4;
+			row = numberOfSection_location/16;
+			col = numberOfSection_location%16;
+			String nos = "";
+			for(int index = 0; index < 2; index++){
+				if(col - index < 0){
+					row = row - 1;
+					col = 16;
+				}
+				nos = nos + hxdarray[row][col - index];
+			}
+			int numberOfSection = Integer.parseInt(nos, 16);
+			System.out.println("PE 파일 섹션 개수 : " + numberOfSection);
+
+
+			// Optional header 크기
+			int sizeOfOptionalHeader_location = INH_finish_location_index + 18;
+			row = sizeOfOptionalHeader_location/16;
+			col = sizeOfOptionalHeader_location%16;
+			String sooh = "";
+			for(int index = 0; index < 2; index++){
+				if(col - index < 0){
+					row = row - 1;
+					col = 16;
+				}
+				sooh = sooh + hxdarray[row][col - index];
+			}
+			int sizeOfOptionalHeader = Integer.parseInt(sooh, 16);
+			System.out.println("optionalheader 크기 : " + sizeOfOptionalHeader);
+
+			// Image_file_header 끝나는 지점
+			int Image_file_header_finish_location = INH_finish_location_index + 20;
+
+			// BaseOfCode
+			int baseofcode_location = Image_file_header_finish_location + 24;
+			row = baseofcode_location/16;
+			col = baseofcode_location%16;
+			String bc = "";
+			for(int index = 0; index < 4; index++){
+				if(col - index < 0){
+					row = row - 1;
+					col = 16;
+				}
+				bc = bc + hxdarray[row][col - index];
+			}
+			int baseofcode = Integer.parseInt(bc, 16);
+			System.out.println("base of code : " + baseofcode);
+
+			// ImageBase
+			int image_location = Image_file_header_finish_location + 32;
+			row = image_location/16;
+			col = image_location%16;
+			String image = "";
+			for(int index = 0; index < 4; index++){
+				if(col - index < 0){
+					row = row - 1;
+					col = 16;
+				}
+				image = image + hxdarray[row][col - index];
+			}
+			int imagebase = Integer.parseInt(image, 16);
+			System.out.println("Imagebase : " + imagebase);
+
+			// Image_optional_header 끝나는 지점
+			int image_optional_header_finish = Image_file_header_finish_location + sizeOfOptionalHeader;
+
+			// section of number
+
 
 		}
 
