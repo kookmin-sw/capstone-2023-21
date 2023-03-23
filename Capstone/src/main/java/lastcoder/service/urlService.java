@@ -92,7 +92,6 @@ public class urlService {
 
 			// 파일 바이너리화 & 16진수 데이터형 변환
 			info.setBinary_array("0" + binaryEnc(fileToByteArray(filelocation)));
-			System.out.println("여기 살고 있니");
 			String binaryfile = info.getBinary_array();
 			String hxdresult = "";
 			String hxd = "";
@@ -272,7 +271,59 @@ public class urlService {
 			// Image_optional_header 끝나는 지점
 			int image_optional_header_finish = Image_file_header_finish_location + sizeOfOptionalHeader;
 
-			// section of number
+			// section of number & virtualAddress
+			int section_number = 0;
+			for(int index = 0; index < numberOfSection; index++) {
+				int virtualAddress_location = image_optional_header_finish + (index * 40 + 16);
+				String va = "";
+				int section_row = virtualAddress_location / 16;
+				int section_col = virtualAddress_location % 16;
+				for (int va_index = 0; va_index < 4; va_index++) {
+					if (section_col - va_index < 0) {
+						section_row = row - 1;
+						section_col = 16;
+					}
+					va = va + hxdarray[section_row][section_col - va_index];
+				}
+				int virtualAddress = Integer.parseInt(va, 16);
+				if(virtualAddress == baseofcode){
+					section_number = index;
+					break;
+				}
+			}
+
+			// sectiontable_name
+			int section_table_name = image_optional_header_finish + (section_number*40+8);
+			String sn = "";
+			row = section_table_name/16;
+			col = section_table_name%16;
+			for(int index = 0; index < 8; index++){
+				if(col - index < 0){
+					row = row -1;
+					col = 16;
+				}
+				String component = hxdarray[row][col - index];
+				int num = Integer.parseInt(component, 16);
+				char str = (char)num;
+				sn = sn + str;
+			}
+			System.out.println("section_table name : " + sn);
+
+			// characteristics
+			int characteristics_location = image_optional_header_finish + (section_number*40 + 40);
+			row = characteristics_location/16;
+			col = characteristics_location%16;
+
+			String characteristics = hxdarray[row][col];
+			System.out.println("파일 속성 : " + characteristics);
+
+			// first packing file quarantine
+			if(characteristics.equals("80") || characteristics.equals("a0") || characteristics.equals("c0") || characteristics.equals("e0")){
+				System.out.println("패킹 파일 입니다");
+			}
+			else{
+				System.out.println("패킹 파일이 아닙니다.");
+			}
 
 
 		}
