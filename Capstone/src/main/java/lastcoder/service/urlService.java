@@ -69,6 +69,34 @@ public class urlService {
 //		return out;
 		return fileArray;
 	}
+	public double EntryPointEntropy(String filelocation, int offset, int size)throws IOException{
+		FileInputStream fis = new FileInputStream(filelocation);
+		fis.skip(offset);
+		byte[] entryPointData = new byte[size];
+		fis.read(entryPointData);
+		fis.close();
+
+		// Step 2: 분리한 각 바이트 값의 등장 빈도를 계산합니다.
+		int[] freq = new int[256];
+		for (byte b : entryPointData) {
+			freq[b & 0xFF]++;
+		}
+
+		// Step 3: 등장 빈도를 확률 분포로 바꾸어 정보 이론(Shannon entropy)의 엔트로피 공식에 따라 계산합니다.
+		double entropy = 0;
+		for (int f : freq) {
+			if (f > 0) {
+				double p = (double) f / entryPointData.length;
+				entropy -= p * Math.log(p) / Math.log(2);
+			}
+		}
+
+		// 엔트로피 값을 출력합니다.
+		System.out.println("Entry point entropy: " + entropy);
+
+
+		return entropy;
+	}
 
 	public File multipartFileToFile(MultipartFile multipartFile) throws IOException {
 		File file = new File(multipartFile.getOriginalFilename());
@@ -309,6 +337,36 @@ public class urlService {
 			}
 			System.out.println("section_table name : " + sn);
 
+			//section_table_offset
+			int section_table_offset_location = image_optional_header_finish + (section_number*40 + 24);
+			row = section_table_offset_location/16;
+			col = section_table_offset_location%16;
+			String sto = "";
+			for(int index = 0; index < 4; index++){
+				if(col - index < 0){
+					row = row - 1;
+					col = 16;
+				}
+				sto = sto + hxdarray[row][col - index];
+			}
+			int section_table_offset = Integer.parseInt(sto, 16);
+			System.out.println("section table offset : " + section_table_offset);
+
+			//section_table_size
+			int section_table_size_location = image_optional_header_finish + (section_number*40 + 20);
+			row = section_table_size_location/16;
+			col = section_table_size_location%16;
+			String sts = "";
+			for(int index = 0; index < 4; index++){
+				if(col - index < 0){
+					row = row - 1;
+					col = 16;
+				}
+				sts = sts + hxdarray[row][col - index];
+			}
+			int section_table_size = Integer.parseInt(sts, 16);
+			System.out.println("section table size : " + section_table_size);
+
 			// characteristics
 			int characteristics_location = image_optional_header_finish + (section_number*40 + 40);
 			row = characteristics_location/16;
@@ -317,9 +375,17 @@ public class urlService {
 			String characteristics = hxdarray[row][col];
 			System.out.println("파일 속성 : " + characteristics);
 
-			// first packing file quarantine
+			// 엔트로피
+			double entropy = EntryPointEntropy(filelocation, section_table_offset, section_table_size);
+
+			// packing file quarantine(write and entropy)
 			if(characteristics.equals("80") || characteristics.equals("a0") || characteristics.equals("c0") || characteristics.equals("e0")){
-				System.out.println("패킹 파일 입니다");
+				if(entropy > 6.85 && entropy < 7.99){
+					System.out.println("패킹 파일 입니다.");
+				}
+				else{
+					System.out.println("패킹 파일이 아닙니다.");
+				}
 			}
 			else{
 				System.out.println("패킹 파일이 아닙니다.");
