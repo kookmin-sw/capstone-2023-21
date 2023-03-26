@@ -6,7 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.Paths;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.python.core.PyFunction;
@@ -112,11 +114,20 @@ public class urlService {
 		info = new info();
 		info.setFlist(list);
 
+		// 삭제할 파일들
+		List<String> deletelist = new ArrayList<String>();
+
+		// 언 패킹 파일들 바이너리화 목록
+		List<String> unpacking_file = new ArrayList<String>();
+
+
 		for(int i=0; i < list.size(); i++){
 
 			String filelocation = list.get(i).toString();
 			//info.setBase64_array(new String(base64Enc(fileToByteArray(filelocation))));
 			//info.setByteArray(fileToByteArray(filelocation));
+
+			deletelist.add(filelocation);
 
 			// 파일 바이너리화 & 16진수 데이터형 변환
 			info.setBinary_array("0" + binaryEnc(fileToByteArray(filelocation)));
@@ -382,13 +393,81 @@ public class urlService {
 			if(characteristics.equals("80") || characteristics.equals("a0") || characteristics.equals("c0") || characteristics.equals("e0")){
 				if(entropy > 6.85 && entropy < 7.99){
 					System.out.println("패킹 파일 입니다.");
+
+					// 언 패킹하기(UPX)
+					String packedFilePath = filelocation;
+					String upxPath = "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\upx-3.95-win64\\upx.exe";
+					ProcessBuilder pb = new ProcessBuilder(upxPath, "-d" ,packedFilePath);
+					try{
+						Process process = pb.start();
+						process.waitFor();
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
+
+
+					String upx_binary = "0" + binaryEnc(fileToByteArray(filelocation));
+					String upx_hxdresult = "";
+					String upx_hxd = "";
+					int upx_count = 0;
+					int upx_space = 0;
+					System.out.println(upx_binary.length());
+
+					for (int j = 1; j <= upx_binary.length(); j++) {
+
+						upx_hxd = upx_hxd + upx_binary.charAt(j - 1);
+						upx_count++;
+
+						if (upx_count == 4) {
+							int binaryToHex = Integer.parseInt(upx_hxd, 2);
+							String hexString = Integer.toHexString(binaryToHex);
+							upx_hxdresult = upx_hxdresult + hexString;
+							upx_hxd = "";
+							upx_space++;
+							upx_count = 0;
+						}
+
+						if (upx_space == 2) {
+							upx_hxdresult = upx_hxdresult + " ";
+							upx_space = 0;
+						}
+
+					}
+
+					unpacking_file.add(upx_hxdresult);
+
+					// 이중배열로 파일 16진수 데이터로 출력
+					String upx_hexarray[] = upx_hxdresult.split(" ");
+					System.out.println("배열크기 : " + upx_hxdresult.split(" ").length);
+					System.out.println("마지막 값 : " + upx_hexarray[upx_hexarray.length-1]);
+					String upx_hxdarray[][] = new String[upx_hexarray.length/16][16];
+
+					for(int upx_row = 0; upx_row < upx_hxdarray.length; upx_row++){
+						for(int upx_col = 0; upx_col < upx_hxdarray[upx_row].length; upx_col++){
+							upx_hxdarray[upx_row][upx_col] = upx_hexarray[upx_row*16 + upx_col];
+						}
+					}
+
+					for(int upx_row = 0; upx_row < upx_hxdarray.length; upx_row++){
+						for(int upx_col = 0; upx_col < upx_hxdarray[upx_row].length; upx_col++){
+							System.out.print(upx_hxdarray[upx_row][upx_col] + " ");
+						}
+						System.out.println();
+					}
+
+				}
+				else if(entropy > 5.05 && entropy < 6.69){
+					System.out.println("패킹 파일이 아닙니다.");
+					unpacking_file.add(hxdresult);
 				}
 				else{
-					System.out.println("패킹 파일이 아닙니다.");
+					System.out.println("패킹 파일인지 탐지하지 못했습니다.");
+					unpacking_file.add(hxdresult);
 				}
 			}
 			else{
 				System.out.println("패킹 파일이 아닙니다.");
+				unpacking_file.add(hxdresult);
 			}
 
 
