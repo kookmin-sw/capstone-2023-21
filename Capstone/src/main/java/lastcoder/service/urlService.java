@@ -71,6 +71,25 @@ public class urlService {
 //		return out;
 		return fileArray;
 	}
+
+
+	// 16진수 값 10진수로 변환 함수
+	public int HexToDecimal(int index_location, int byte_size, String hxdarray[][]){
+		int row = index_location/16;
+		int col = index_location%16;
+		String hexresult = "";
+		for(int i = 0; i < byte_size; i++){
+			if(col - i < 0) {
+				row = row - 1;
+				col = 16;
+			}
+			hexresult = hexresult + hxdarray[row][col - i];
+		}
+		return Integer.parseInt(hexresult, 16);
+	}
+
+
+	// 진입점 섹션의 엔트로피 계산 함수
 	public double EntryPointEntropy(String filelocation, int offset, int size)throws IOException{
 		FileInputStream fis = new FileInputStream(filelocation);
 		fis.skip(offset);
@@ -96,16 +115,18 @@ public class urlService {
 		// 엔트로피 값을 출력합니다.
 		System.out.println("Entry point entropy: " + entropy);
 
-
 		return entropy;
 	}
 
+	//multipartFile 객체를 File 객체로 변환
 	public File multipartFileToFile(MultipartFile multipartFile) throws IOException {
 		File file = new File(multipartFile.getOriginalFilename());
 		multipartFile.transferTo(file);
 		return file;
 	}
 
+
+	// 파일 바이너리화
 	public info byteArrayToBinary(List<File> list) throws IOException {
 
 		String location = "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\quarantine";
@@ -245,33 +266,12 @@ public class urlService {
 
 			// PE파일 섹션 개수
 			int numberOfSection_location = INH_finish_location_index + 4;
-			row = numberOfSection_location/16;
-			col = numberOfSection_location%16;
-			String nos = "";
-			for(int index = 0; index < 2; index++){
-				if(col - index < 0){
-					row = row - 1;
-					col = 16;
-				}
-				nos = nos + hxdarray[row][col - index];
-			}
-			int numberOfSection = Integer.parseInt(nos, 16);
+			int numberOfSection = HexToDecimal(numberOfSection_location, 2, hxdarray);
 			System.out.println("PE 파일 섹션 개수 : " + numberOfSection);
-
 
 			// Optional header 크기
 			int sizeOfOptionalHeader_location = INH_finish_location_index + 18;
-			row = sizeOfOptionalHeader_location/16;
-			col = sizeOfOptionalHeader_location%16;
-			String sooh = "";
-			for(int index = 0; index < 2; index++){
-				if(col - index < 0){
-					row = row - 1;
-					col = 16;
-				}
-				sooh = sooh + hxdarray[row][col - index];
-			}
-			int sizeOfOptionalHeader = Integer.parseInt(sooh, 16);
+			int sizeOfOptionalHeader = HexToDecimal(sizeOfOptionalHeader_location, 2, hxdarray);
 			System.out.println("optionalheader 크기 : " + sizeOfOptionalHeader);
 
 			// Image_file_header 끝나는 지점
@@ -279,32 +279,12 @@ public class urlService {
 
 			// BaseOfCode
 			int baseofcode_location = Image_file_header_finish_location + 24;
-			row = baseofcode_location/16;
-			col = baseofcode_location%16;
-			String bc = "";
-			for(int index = 0; index < 4; index++){
-				if(col - index < 0){
-					row = row - 1;
-					col = 16;
-				}
-				bc = bc + hxdarray[row][col - index];
-			}
-			int baseofcode = Integer.parseInt(bc, 16);
+			int baseofcode = HexToDecimal(baseofcode_location, 4, hxdarray);
 			System.out.println("base of code : " + baseofcode);
 
 			// ImageBase
 			int image_location = Image_file_header_finish_location + 32;
-			row = image_location/16;
-			col = image_location%16;
-			String image = "";
-			for(int index = 0; index < 4; index++){
-				if(col - index < 0){
-					row = row - 1;
-					col = 16;
-				}
-				image = image + hxdarray[row][col - index];
-			}
-			int imagebase = Integer.parseInt(image, 16);
+			int imagebase = HexToDecimal(image_location, 4, hxdarray);
 			System.out.println("Imagebase : " + imagebase);
 
 			// Image_optional_header 끝나는 지점
@@ -350,32 +330,12 @@ public class urlService {
 
 			//section_table_offset
 			int section_table_offset_location = image_optional_header_finish + (section_number*40 + 24);
-			row = section_table_offset_location/16;
-			col = section_table_offset_location%16;
-			String sto = "";
-			for(int index = 0; index < 4; index++){
-				if(col - index < 0){
-					row = row - 1;
-					col = 16;
-				}
-				sto = sto + hxdarray[row][col - index];
-			}
-			int section_table_offset = Integer.parseInt(sto, 16);
+			int section_table_offset = HexToDecimal(section_table_offset_location, 4, hxdarray);
 			System.out.println("section table offset : " + section_table_offset);
 
 			//section_table_size
 			int section_table_size_location = image_optional_header_finish + (section_number*40 + 20);
-			row = section_table_size_location/16;
-			col = section_table_size_location%16;
-			String sts = "";
-			for(int index = 0; index < 4; index++){
-				if(col - index < 0){
-					row = row - 1;
-					col = 16;
-				}
-				sts = sts + hxdarray[row][col - index];
-			}
-			int section_table_size = Integer.parseInt(sts, 16);
+			int section_table_size = HexToDecimal(section_table_size_location, 4,hxdarray);
 			System.out.println("section table size : " + section_table_size);
 
 			// characteristics
@@ -391,6 +351,7 @@ public class urlService {
 
 			// packing file quarantine(write and entropy)
 			if(characteristics.equals("80") || characteristics.equals("a0") || characteristics.equals("c0") || characteristics.equals("e0")){
+
 				if(entropy > 6.85 && entropy < 7.99){
 					System.out.println("패킹 파일 입니다.");
 
@@ -398,6 +359,7 @@ public class urlService {
 					String packedFilePath = filelocation;
 					String upxPath = "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\upx-3.95-win64\\upx.exe";
 					ProcessBuilder pb = new ProcessBuilder(upxPath, "-d" ,packedFilePath);
+
 					try{
 						Process process = pb.start();
 						process.waitFor();
@@ -405,8 +367,8 @@ public class urlService {
 						throw new RuntimeException(e);
 					}
 
-
 					String upx_binary = "0" + binaryEnc(fileToByteArray(filelocation));
+
 					String upx_hxdresult = "";
 					String upx_hxd = "";
 					int upx_count = 0;
