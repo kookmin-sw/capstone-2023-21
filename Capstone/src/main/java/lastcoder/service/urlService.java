@@ -111,7 +111,7 @@ public class urlService {
 		}
 		return hxdarray;
 	}
-	// modify
+	// 바이너리 파일 16진수 변환
 	public String BinaryToHxd(String binaryarray){
 		int padding = 8 - binaryarray.length() % 8;
 		String paddedBinaryString = binaryarray;
