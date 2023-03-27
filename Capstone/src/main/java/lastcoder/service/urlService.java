@@ -88,6 +88,59 @@ public class urlService {
 		return Integer.parseInt(hexresult, 16);
 	}
 
+	public String [][] HxdresultToArray(String hxdresult){
+
+		String hexarray[] = hxdresult.split(" ");
+		System.out.println("배열크기 : " + hxdresult.split(" ").length);
+		System.out.println("마지막 값 : " + hexarray[hexarray.length-1]);
+		String hxdarray[][] = new String[hexarray.length/16][16];
+
+		for(int row = 0; row < hxdarray.length; row++){
+			for(int col = 0; col < hxdarray[row].length; col++){
+				hxdarray[row][col] = hexarray[row*16 + col];
+			}
+		}
+
+		// 출력
+		for(int row = 0; row < hxdarray.length; row++){
+			for(int col = 0; col < hxdarray[row].length; col++){
+				System.out.print(hxdarray[row][col] + " ");
+			}
+			System.out.println();
+		}
+		return hxdarray;
+	}
+
+	public String BinaryToHxd(String binaryarray){
+		String hxdresult = "";
+		String hxd = "";
+		int count = 0;
+		int space = 0;
+		System.out.println(binaryarray.length());
+
+		for (int j = 1; j <= binaryarray.length(); j++){
+
+			hxd = hxd + binaryarray.charAt(j-1);
+			count++;
+
+			if(count == 4){
+				int binaryToHex = Integer.parseInt(hxd,2);
+				String hexString = Integer.toHexString(binaryToHex);
+				hxdresult = hxdresult + hexString;
+				hxd = "";
+				space++;
+				count = 0;
+			}
+
+			if(space == 2){
+				hxdresult = hxdresult + " ";
+				space = 0;
+			}
+			System.out.println(j);
+		}
+		return hxdresult;
+	}
+
 
 	// 진입점 섹션의 엔트로피 계산 함수
 	public double EntryPointEntropy(String filelocation, int offset, int size)throws IOException{
@@ -153,58 +206,14 @@ public class urlService {
 			// 파일 바이너리화 & 16진수 데이터형 변환
 			info.setBinary_array("0" + binaryEnc(fileToByteArray(filelocation)));
 			String binaryfile = info.getBinary_array();
-			String hxdresult = "";
-			String hxd = "";
-			int count = 0;
-			int space = 0;
-			System.out.println(binaryfile.length());
-
-			for (int j = 1; j <= binaryfile.length(); j++){
-
-				hxd = hxd + binaryfile.charAt(j-1);
-				count++;
-
-				if(count == 4){
-					int binaryToHex = Integer.parseInt(hxd,2);
-					String hexString = Integer.toHexString(binaryToHex);
-					hxdresult = hxdresult + hexString;
-					hxd = "";
-					space++;
-					count = 0;
-				}
-
-				if(space == 2){
-					hxdresult = hxdresult + " ";
-					space = 0;
-				}
-				System.out.println(j);
-			}
+			String hxdresult = BinaryToHxd(binaryfile);
 
 			info.setHex_array(hxdresult);
 
 			// 이중배열로 파일 16진수 데이터로 출력
-			String hexarray[] = hxdresult.split(" ");
-			System.out.println("배열크기 : " + hxdresult.split(" ").length);
-			System.out.println("마지막 값 : " + hexarray[hexarray.length-1]);
-			String hxdarray[][] = new String[hexarray.length/16][16];
-
-			for(int row = 0; row < hxdarray.length; row++){
-				for(int col = 0; col < hxdarray[row].length; col++){
-					hxdarray[row][col] = hexarray[row*16 + col];
-				}
-			}
-
-			for(int row = 0; row < hxdarray.length; row++){
-				for(int col = 0; col < hxdarray[row].length; col++){
-					System.out.print(hxdarray[row][col] + " ");
-				}
-				System.out.println();
-			}
-
-
+			String hxdarray[][] = HxdresultToArray(hxdresult);
 
 			// Image_dos_header
-
 			// e_magic 2byte로 "MZ" PE파일 확인
 			boolean PEcheck = false;
 			String mz = "";
@@ -294,17 +303,7 @@ public class urlService {
 			int section_number = 0;
 			for(int index = 0; index < numberOfSection; index++) {
 				int virtualAddress_location = image_optional_header_finish + (index * 40 + 16);
-				String va = "";
-				int section_row = virtualAddress_location / 16;
-				int section_col = virtualAddress_location % 16;
-				for (int va_index = 0; va_index < 4; va_index++) {
-					if (section_col - va_index < 0) {
-						section_row = row - 1;
-						section_col = 16;
-					}
-					va = va + hxdarray[section_row][section_col - va_index];
-				}
-				int virtualAddress = Integer.parseInt(va, 16);
+				int virtualAddress = HexToDecimal(virtualAddress_location, 4, hxdarray);
 				if(virtualAddress == baseofcode){
 					section_number = index;
 					break;
@@ -367,56 +366,13 @@ public class urlService {
 						throw new RuntimeException(e);
 					}
 
+					//언 패킹 파일 바이너리화
 					String upx_binary = "0" + binaryEnc(fileToByteArray(filelocation));
-
-					String upx_hxdresult = "";
-					String upx_hxd = "";
-					int upx_count = 0;
-					int upx_space = 0;
-					System.out.println(upx_binary.length());
-
-					for (int j = 1; j <= upx_binary.length(); j++) {
-
-						upx_hxd = upx_hxd + upx_binary.charAt(j - 1);
-						upx_count++;
-
-						if (upx_count == 4) {
-							int binaryToHex = Integer.parseInt(upx_hxd, 2);
-							String hexString = Integer.toHexString(binaryToHex);
-							upx_hxdresult = upx_hxdresult + hexString;
-							upx_hxd = "";
-							upx_space++;
-							upx_count = 0;
-						}
-
-						if (upx_space == 2) {
-							upx_hxdresult = upx_hxdresult + " ";
-							upx_space = 0;
-						}
-
-					}
-
+					String upx_hxdresult = BinaryToHxd(upx_binary);
 					unpacking_file.add(upx_hxdresult);
 
 					// 이중배열로 파일 16진수 데이터로 출력
-					String upx_hexarray[] = upx_hxdresult.split(" ");
-					System.out.println("배열크기 : " + upx_hxdresult.split(" ").length);
-					System.out.println("마지막 값 : " + upx_hexarray[upx_hexarray.length-1]);
-					String upx_hxdarray[][] = new String[upx_hexarray.length/16][16];
-
-					for(int upx_row = 0; upx_row < upx_hxdarray.length; upx_row++){
-						for(int upx_col = 0; upx_col < upx_hxdarray[upx_row].length; upx_col++){
-							upx_hxdarray[upx_row][upx_col] = upx_hexarray[upx_row*16 + upx_col];
-						}
-					}
-
-					for(int upx_row = 0; upx_row < upx_hxdarray.length; upx_row++){
-						for(int upx_col = 0; upx_col < upx_hxdarray[upx_row].length; upx_col++){
-							System.out.print(upx_hxdarray[upx_row][upx_col] + " ");
-						}
-						System.out.println();
-					}
-
+					String upx_hxdarray[][] = HxdresultToArray(upx_hxdresult);
 				}
 				else if(entropy > 5.05 && entropy < 6.69){
 					System.out.println("패킹 파일이 아닙니다.");
