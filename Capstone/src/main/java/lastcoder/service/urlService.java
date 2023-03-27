@@ -112,33 +112,12 @@ public class urlService {
 	}
 
 	public String BinaryToHxd(String binaryarray){
-		String hxdresult = "";
-		String hxd = "";
-		int count = 0;
-		int space = 0;
-		System.out.println(binaryarray.length());
-
-		for (int j = 1; j <= binaryarray.length(); j++){
-
-			hxd = hxd + binaryarray.charAt(j-1);
-			count++;
-
-			if(count == 4){
-				int binaryToHex = Integer.parseInt(hxd,2);
-				String hexString = Integer.toHexString(binaryToHex);
-				hxdresult = hxdresult + hexString;
-				hxd = "";
-				space++;
-				count = 0;
-			}
-
-			if(space == 2){
-				hxdresult = hxdresult + " ";
-				space = 0;
-			}
-			System.out.println(j);
+		byte[] byteArray = new BigInteger(binaryarray, 2).toByteArray();
+		StringBuilder resultBuilder = new StringBuilder();
+		for (int i = 0; i < byteArray.length; i++) {
+			resultBuilder.append(String.format("%02X ", byteArray[i]));
 		}
-		return hxdresult;
+		return resultBuilder.toString();
 	}
 
 
