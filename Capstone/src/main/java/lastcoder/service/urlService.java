@@ -110,7 +110,7 @@ public class urlService {
 		}
 		return hxdarray;
 	}
-
+	// modify
 	public String BinaryToHxd(String binaryarray){
 		byte[] byteArray = new BigInteger(binaryarray, 2).toByteArray();
 		StringBuilder resultBuilder = new StringBuilder();
