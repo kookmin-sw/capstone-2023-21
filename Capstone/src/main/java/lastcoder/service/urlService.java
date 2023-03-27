@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.Paths;
@@ -112,12 +113,24 @@ public class urlService {
 	}
 	// modify
 	public String BinaryToHxd(String binaryarray){
-		byte[] byteArray = new BigInteger(binaryarray, 2).toByteArray();
-		StringBuilder resultBuilder = new StringBuilder();
-		for (int i = 0; i < byteArray.length; i++) {
-			resultBuilder.append(String.format("%02X ", byteArray[i]));
+		int padding = 8 - binaryarray.length() % 8;
+		String paddedBinaryString = binaryarray;
+		for (int i = 0; i < padding; i++) {
+			paddedBinaryString = "0" + paddedBinaryString;
 		}
-		return resultBuilder.toString();
+
+		byte[] byteArray = new byte[paddedBinaryString.length() / 8];
+		for (int i = 0; i < byteArray.length; i++) {
+			byteArray[i] = (byte) Integer.parseInt(paddedBinaryString.substring(i * 8, (i + 1) * 8), 2);
+		}
+
+		ByteBuffer buffer = ByteBuffer.wrap(byteArray);
+		StringBuilder hexString = new StringBuilder();
+		while (buffer.hasRemaining()) {
+			hexString.append(String.format("%02X ", buffer.get()));
+		}
+
+		return hexString.toString();
 	}
 
 
@@ -183,7 +196,7 @@ public class urlService {
 			deletelist.add(filelocation);
 
 			// 파일 바이너리화 & 16진수 데이터형 변환
-			info.setBinary_array("0" + binaryEnc(fileToByteArray(filelocation)));
+			info.setBinary_array( binaryEnc(fileToByteArray(filelocation)));
 			String binaryfile = info.getBinary_array();
 			String hxdresult = BinaryToHxd(binaryfile);
 
@@ -346,7 +359,7 @@ public class urlService {
 					}
 
 					//언 패킹 파일 바이너리화
-					String upx_binary = "0" + binaryEnc(fileToByteArray(filelocation));
+					String upx_binary =  binaryEnc(fileToByteArray(filelocation));
 					String upx_hxdresult = BinaryToHxd(upx_binary);
 					unpacking_file.add(upx_hxdresult);
 
