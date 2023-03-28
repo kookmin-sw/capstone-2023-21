@@ -2,14 +2,13 @@
 
 ## 1. 프로젝트 소개
 
-- 주제 : 악성 파일을 검사 해주는 웹 페이지 개발
+1. 주제 : 악성 파일을 검사 해주는 웹 페이지 개발
 
-- 주요 기술 : PE 파일 분석, 악성 파일 분석
+2. 주요 기술 : PE 파일 분석, 악성 파일 분석
 
-- 진행 방향 
-
-  *1.Spring Framework로 웹 페이지 개발(3 Tier-Architecture) 
-  *2.Tensorflow로 Deep Learning을 construct 하여 악성 파일 검사 
+3. 진행 방향 
+ - Spring Framework로 웹 페이지 개발(3 Tier-Architecture) 
+ - Tensorflow로 Deep Learning을 construct 하여 악성 파일 검사 
 
 
 ## 2. 소개 영상
