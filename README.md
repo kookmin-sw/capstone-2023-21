@@ -7,8 +7,9 @@
 - 주요 기술 : PE 파일 분석, 악성 파일 분석
 
 - 진행 방향 
-1.Spring Framework로 웹 페이지 개발(3 Tier-Architecture) 
-2.Tensorflow로 Deep Learning을 construct 하여 악성 파일 검사 
+
+  *1.Spring Framework로 웹 페이지 개발(3 Tier-Architecture) 
+  *2.Tensorflow로 Deep Learning을 construct 하여 악성 파일 검사 
 
 
 ## 2. 소개 영상
