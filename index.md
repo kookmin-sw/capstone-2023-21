@@ -1,37 +1,31 @@
-## Welcome to GitHub Pages
+# 프로젝트 이름 (미정)
 
-You can use the [editor on GitHub](https://github.com/kookmin-sw/cap-template/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+## 1. 프로젝트 소개
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+1. 주제 : 악성 파일을 검사 해주는 웹 페이지 개발
 
-### Markdown
+2. 주요 기술 : PE 파일 분석, 악성 파일 분석
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+3. 진행 방향 
+ - Spring Framework로 웹 페이지 개발(3 Tier-Architecture) 
+ - Tensorflow로 Deep Learning을 construct 하여 악성 파일 검사 
 
-```markdown
-Syntax highlighted code block
 
-# Header 1
-## Header 2
-### Header 3
+## 2. 소개 영상
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
 
-**Bold** and _Italic_ and `Code` text
+## 3. 팀 소개
 
-[Link](url) and ![Image](src)
-```
+팀 : 21조 (kookmin-sw/capstone-2023-21)
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+직급 | 이름 | 학번
+---|---|---|
+팀장 | 유남규 | ****2842
+팀원 | 김용호 | ****1588
 
-### Jekyll Themes
+## 4. 사용법
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/kookmin-sw/cap-template/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
-### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+## 5. 기타
