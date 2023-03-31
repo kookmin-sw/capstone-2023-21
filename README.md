@@ -10,7 +10,8 @@ github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-s
 2. 주요 기술 : PE 파일 분석, 악성 파일 분석
 
 3. 진행 방향 
- - Spring Framework로 웹 페이지 개발(3 Tier-Architecture) 
+ - Spring Framework로 웹 페이지 개발(3 Tier-Architecture)
+ - upload한 파일들을 분석하여 패킹 탐지 및 언 패킹 
  - Tensorflow로 Deep Learning을 construct 하여 악성 파일 검사 
 
 
