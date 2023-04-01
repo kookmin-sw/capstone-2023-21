@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.python.core.PyFunction;
 import org.python.core.PyInteger;
+import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,8 +110,11 @@ public class urlService {
 			}
 			System.out.println();
 		}
+
 		return hxdarray;
+
 	}
+
 	// 바이너리 파일 16진수 변환
 	public String BinaryToHxd(String binaryarray){
 		int padding = 8 - binaryarray.length() % 8;
@@ -170,6 +174,23 @@ public class urlService {
 		return file;
 	}
 
+	// deeplearning에 PE body데이터를 넘겨주는 함수
+	public String deeplearning(List bodylist){
+
+		PythonInterpreter interpreter = new PythonInterpreter();
+
+		// 파이썬 함수에 넘겨줄 리스트 객체를 생성합니다.
+		PyObject pyList = PyList.fromList(bodylist);
+
+		// 파이썬 함수를 호출합니다.
+		interpreter.exec("import my_module\n" +
+				"result = my_module.my_function(" + pyList.__repr__() + ")\n");
+
+		// 파이썬 함수의 결과를 출력합니다.
+		PyObject result = interpreter.get("result");
+		return result.toString();
+	}
+
 
 	// 파일 바이너리화
 	public info byteArrayToBinary(List<File> list) throws IOException {
@@ -183,8 +204,8 @@ public class urlService {
 		// 삭제할 파일들
 		List<String> deletelist = new ArrayList<String>();
 
-		// 언 패킹 파일들 바이너리화 목록
-		List<String> unpacking_file = new ArrayList<String>();
+		// PE 파일의 body
+		List<String> PEbodylist = new ArrayList<String>();
 
 
 		for(int i=0; i < list.size(); i++){
@@ -196,11 +217,9 @@ public class urlService {
 			deletelist.add(filelocation);
 
 			// 파일 바이너리화 & 16진수 데이터형 변환
-			info.setBinary_array( binaryEnc(fileToByteArray(filelocation)));
-			String binaryfile = info.getBinary_array();
+			String binaryfile = binaryEnc(fileToByteArray(filelocation));
 			String hxdresult = BinaryToHxd(binaryfile);
 
-			info.setHex_array(hxdresult);
 
 			// 이중배열로 파일 16진수 데이터로 출력
 			String hxdarray[][] = HxdresultToArray(hxdresult);
@@ -341,7 +360,7 @@ public class urlService {
 			double entropy = EntryPointEntropy(filelocation, section_table_offset, section_table_size);
 
 			// packing file quarantine(write and entropy)
-			if(characteristics.equals("80") || characteristics.equals("a0") || characteristics.equals("c0") || characteristics.equals("e0")){
+			if(characteristics.equals("80") || characteristics.equals("A0") || characteristics.equals("C0") || characteristics.equals("E0")){
 
 				if(entropy > 6.85 && entropy < 7.99){
 					System.out.println("패킹 파일 입니다.");
@@ -360,34 +379,39 @@ public class urlService {
 
 					//언 패킹 파일 바이너리화
 					String upx_binary =  binaryEnc(fileToByteArray(filelocation));
-					String upx_hxdresult = BinaryToHxd(upx_binary);
-					unpacking_file.add(upx_hxdresult);
+					hxdresult = BinaryToHxd(upx_binary);
 
 					// 이중배열로 파일 16진수 데이터로 출력
-					String upx_hxdarray[][] = HxdresultToArray(upx_hxdresult);
+					hxdarray = HxdresultToArray(hxdresult);
 				}
 				else if(entropy > 5.05 && entropy < 6.69){
 					System.out.println("패킹 파일이 아닙니다.");
-					unpacking_file.add(hxdresult);
 				}
 				else{
 					System.out.println("패킹 파일인지 탐지하지 못했습니다.");
-					unpacking_file.add(hxdresult);
 				}
 			}
 			else{
 				System.out.println("패킹 파일이 아닙니다.");
-				unpacking_file.add(hxdresult);
 			}
 
+			// PE 파일의 body 추출(.text 데이터)
+			String PEbody = "";
+			String[] filearray = hxdresult.split(" ");
+			for(int index = section_table_offset; index < section_table_size; index++){
+				PEbody = PEbody + filearray[index] + " ";
+			}
+			System.out.println(PEbody);
+
+			PEbodylist.add(PEbody);
 
 		}
 
+		// 악성코드 탐지 deep learning 에 PE body 데이터를 파라미터로 넘겨주는 코드
+		//String malware_result = deeplearning(PEbodylist);
 
 		//info.setUrl_info(url_info);
 		//info.setFile_location(file_loaction);
-
-
 		//byteArrayToImage(info);
 
 		return info;

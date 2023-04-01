@@ -39,9 +39,7 @@ public class mainController {
 		String hi = "hello";
 		return hi;
 	}
-	
-	
-	
+
 	@GetMapping("/input_URL")
 	public String inputURL() {
 //		model.addAttribute("url_info", new String());
