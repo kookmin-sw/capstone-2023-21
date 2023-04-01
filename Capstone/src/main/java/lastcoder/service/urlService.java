@@ -383,6 +383,122 @@ public class urlService {
 
 					// 이중배열로 파일 16진수 데이터로 출력
 					hxdarray = HxdresultToArray(hxdresult);
+
+					//언 패킹하여 PE헤더 정보다 달라질 수 있기 때문에 다시 검사
+					// e_lfanew로 IMAGE_NT_HEADERS 위치 찾기
+					INH_location = "";
+					for(int index = 1; index <= 4; index++){
+						String component = hxdarray[64/16-1][16-index];
+						INH_location = INH_location + component;
+					}
+					System.out.println(INH_location);
+					INH_location_index = Integer.parseInt(INH_location,16);
+
+					row = INH_location_index/16;
+					col = INH_location_index%16;
+
+					System.out.println("행 : " + row + " " + "열 : " + col);
+
+					//IMAGE_NT_HEADERS 위치 확인
+					checkINH = false;
+					checkINH_location = "";
+					increase = 0;
+					INH_row = row;
+					INH_col = col;
+					for(int index = 0; index < 4; index++){
+						INH_col = INH_col + increase;
+						if(INH_col >= 16){
+							INH_col = INH_col-16;
+							INH_row = INH_row+1;
+						}
+						checkINH_location = checkINH_location + hxdarray[INH_row][INH_col];
+						if(increase < 1){
+							increase++;
+						}
+					}
+					System.out.println(checkINH_location);
+					if(checkINH_location.equals("50450000")){
+						checkINH = true;
+					}
+					System.out.println(checkINH + " " + "INH 시작위치입니다.");
+					System.out.println(INH_location_index);
+
+					// INH_location_index 끝위치
+					INH_finish_location_index = INH_location_index + 3;
+
+					// PE파일 섹션 개수
+					numberOfSection_location = INH_finish_location_index + 4;
+					numberOfSection = HexToDecimal(numberOfSection_location, 2, hxdarray);
+					System.out.println("PE 파일 섹션 개수 : " + numberOfSection);
+
+					// Optional header 크기
+					sizeOfOptionalHeader_location = INH_finish_location_index + 18;
+					sizeOfOptionalHeader = HexToDecimal(sizeOfOptionalHeader_location, 2, hxdarray);
+					System.out.println("optionalheader 크기 : " + sizeOfOptionalHeader);
+
+					// Image_file_header 끝나는 지점
+					Image_file_header_finish_location = INH_finish_location_index + 20;
+
+					// BaseOfCode
+					baseofcode_location = Image_file_header_finish_location + 24;
+					baseofcode = HexToDecimal(baseofcode_location, 4, hxdarray);
+					System.out.println("base of code : " + baseofcode);
+
+					// ImageBase
+					image_location = Image_file_header_finish_location + 32;
+					imagebase = HexToDecimal(image_location, 4, hxdarray);
+					System.out.println("Imagebase : " + imagebase);
+
+					// Image_optional_header 끝나는 지점
+					image_optional_header_finish = Image_file_header_finish_location + sizeOfOptionalHeader;
+
+					// section of number & virtualAddress
+					section_number = 0;
+					for(int index = 0; index < numberOfSection; index++) {
+						int virtualAddress_location = image_optional_header_finish + (index * 40 + 16);
+						int virtualAddress = HexToDecimal(virtualAddress_location, 4, hxdarray);
+						if(virtualAddress == baseofcode){
+							section_number = index;
+							break;
+						}
+					}
+
+					// sectiontable_name
+					section_table_name = image_optional_header_finish + (section_number*40+8);
+					sn = "";
+					row = section_table_name/16;
+					col = section_table_name%16;
+					for(int index = 0; index < 8; index++){
+						if(col - index < 0){
+							row = row -1;
+							col = 16;
+						}
+						String component = hxdarray[row][col - index];
+						int num = Integer.parseInt(component, 16);
+						char str = (char)num;
+						sn = sn + str;
+					}
+					System.out.println("section_table name : " + sn);
+
+					//section_table_offset
+					section_table_offset_location = image_optional_header_finish + (section_number*40 + 24);
+					section_table_offset = HexToDecimal(section_table_offset_location, 4, hxdarray);
+					System.out.println("section table offset : " + section_table_offset);
+
+					//section_table_size
+					section_table_size_location = image_optional_header_finish + (section_number*40 + 20);
+					section_table_size = HexToDecimal(section_table_size_location, 4,hxdarray);
+					System.out.println("section table size : " + section_table_size);
+
+					// characteristics
+					characteristics_location = image_optional_header_finish + (section_number*40 + 40);
+					row = characteristics_location/16;
+					col = characteristics_location%16;
+
+					characteristics = hxdarray[row][col];
+					System.out.println("파일 속성 : " + characteristics);
+
+
 				}
 				else if(entropy > 5.05 && entropy < 6.69){
 					System.out.println("패킹 파일이 아닙니다.");
