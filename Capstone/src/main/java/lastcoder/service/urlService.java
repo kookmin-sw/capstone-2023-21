@@ -36,6 +36,7 @@ public class urlService {
 	public String binaryEnc(byte[] byteArray) {
 		String binaryStr = new BigInteger(1, byteArray).toString(2);
 		return binaryStr;
+
 	}
 
 	public byte[] fileToByteArray(String location) {

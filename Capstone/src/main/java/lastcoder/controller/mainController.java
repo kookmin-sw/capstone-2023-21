@@ -42,7 +42,7 @@ public class mainController {
 
 	@GetMapping("/input_URL")
 	public String inputURL() {
-//		model.addAttribute("url_info", new String());
+
 		return "input_URL";
 	}	
 	
@@ -63,9 +63,9 @@ public class mainController {
 
 			String[] extension = fileRealName.split("\\.");
 			System.out.println(extension[extension.length-1]);
-			//if(extension[extension.length-1].equals("exe") || extension[extension.length-1].equals("src") || extension[extension.length-1].equals("dll") || extension[extension.length-1].equals("ocx") || extension[extension.length-1].equals("cpl") || extension[extension.length-1].equals("drv") || extension[extension.length-1].equals("sys") || extension[extension.length-1].equals("vxd") || extension[extension.length-1].equals("obj")){
-			PEfile.add(saveFile);
-			//}
+			if(extension[extension.length-1].equals("exe") || extension[extension.length-1].equals("src") || extension[extension.length-1].equals("dll") || extension[extension.length-1].equals("ocx") || extension[extension.length-1].equals("cpl") || extension[extension.length-1].equals("drv") || extension[extension.length-1].equals("sys") || extension[extension.length-1].equals("vxd") || extension[extension.length-1].equals("obj")){
+				PEfile.add(saveFile);
+			}
 
 			try{
 				fileinputlist.get(i).transferTo(saveFile);
