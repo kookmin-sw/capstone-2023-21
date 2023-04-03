@@ -44,6 +44,12 @@ github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-s
 
 ## 4. 사용법
 
+1. Repositories에서 프로젝트를 다운 받습니다.
+2. 압축을 해제하고 프로젝트를 Spring을 통해 실행
+3. 웹사이트에 'http://localhost:8090/input_URL'입력
+4. 파일 업로드를 클릭하여 파일 선택
+5. submit 버튼을 클릭하여 결과 확인 
+
 ---
 
 ## 5. 기타
