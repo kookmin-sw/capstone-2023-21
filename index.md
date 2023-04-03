@@ -34,10 +34,10 @@
 
 팀 : 21조 (kookmin-sw/capstone-2023-21)
 
-직급 | 이름 | 학번 | 메일
----|---|---|---|
-팀장 | 유남규 | ****2842 | 20152842@kookmin.ac.kr
-팀원 | 김용호 | ****1588 | dydgh0608@kookmin.ac.kr
+직급 | 이름 | 학번 | 메일 | 역할 |
+---|---|---|---|---|
+팀장 | 유남규 | ****2842 | 20152842@kookmin.ac.kr | AI
+팀원 | 김용호 | ****1588 | dydgh0608@kookmin.ac.kr | Frontend, backend, PE file analyze
 
 ---
 
