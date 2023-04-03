@@ -36,8 +36,8 @@
 
 직급 | 이름 | 학번 | 메일 | 역할 |
 ---|---|---|---|---|
-팀장 | 유남규 | ****2842 | 20152842@kookmin.ac.kr | AI
-팀원 | 김용호 | ****1588 | dydgh0608@kookmin.ac.kr | Frontend, backend, PE file analyze
+팀장 | 유남규 | ****2842 | 20152842@kookmin.ac.kr | AI, Malware detection
+팀원 | 김용호 | ****1588 | dydgh0608@kookmin.ac.kr | Frontend, Backend, PE file analyze
 
 ---
 
