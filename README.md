@@ -27,6 +27,8 @@ github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-s
 
 ## 2. 소개 영상
 
+추가 예정
+
 ---
 
 ## 3. 팀 소개
