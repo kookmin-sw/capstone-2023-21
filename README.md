@@ -1,4 +1,4 @@
-# 프로젝트 이름 (미정)
+# Malware Checker
 
 github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-sw.github.io/capstone-2023-21/)
 
