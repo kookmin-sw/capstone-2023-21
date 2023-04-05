@@ -1,12 +1,9 @@
 package lastcoder.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.Paths;
@@ -23,6 +20,8 @@ import org.springframework.stereotype.Service;
 import lastcoder.model.info;
 import org.springframework.web.multipart.MultipartFile;
 
+
+
 @Service
 public class urlService {
 
@@ -36,6 +35,7 @@ public class urlService {
 	public String binaryEnc(byte[] byteArray) {
 		String binaryStr = new BigInteger(1, byteArray).toString(2);
 		return binaryStr;
+
 	}
 
 	public byte[] fileToByteArray(String location) {
@@ -175,20 +175,24 @@ public class urlService {
 	}
 
 	// deeplearning에 PE body데이터를 넘겨주는 함수
-	public String deeplearning(List bodylist){
+	public String deeplearning(String body) {
+		String outputStr = null;
+		try {
+			ProcessBuilder processBuilder = new ProcessBuilder("python", "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\src\\main\\java\\lastcoder\\service\\file.py", body);
+			processBuilder.redirectErrorStream(true);
+			Process process = processBuilder.start();
 
-		PythonInterpreter interpreter = new PythonInterpreter();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			outputStr = reader.readLine();
+			reader.close();
 
-		// 파이썬 함수에 넘겨줄 리스트 객체를 생성합니다.
-		PyObject pyList = PyList.fromList(bodylist);
+			process.waitFor();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		return outputStr;
 
-		// 파이썬 함수를 호출합니다.
-		interpreter.exec("import my_module\n" +
-				"result = my_module.my_function(" + pyList.__repr__() + ")\n");
 
-		// 파이썬 함수의 결과를 출력합니다.
-		PyObject result = interpreter.get("result");
-		return result.toString();
 	}
 
 
@@ -204,8 +208,8 @@ public class urlService {
 		// 삭제할 파일들
 		List<String> deletelist = new ArrayList<String>();
 
-		// PE 파일의 body
-		List<String> PEbodylist = new ArrayList<String>();
+		// 악성코드 결과
+		List<String> malware_result = new ArrayList<String>();
 
 
 		for(int i=0; i < list.size(); i++){
@@ -519,12 +523,15 @@ public class urlService {
 			}
 			System.out.println(PEbody);
 
-			PEbodylist.add(PEbody);
+			String malware = deeplearning(PEbody);
+			System.out.println(malware);
+			malware_result.add(malware);
+
+
 
 		}
 
-		// 악성코드 탐지 deep learning 에 PE body 데이터를 파라미터로 넘겨주는 코드
-		//String malware_result = deeplearning(PEbodylist);
+
 
 		//info.setUrl_info(url_info);
 		//info.setFile_location(file_loaction);
@@ -537,7 +544,7 @@ public class urlService {
 
 		int[][] imageArray = new int[128][128];
 		String binaryArray = info.getBinary_array();
-		
+
 		int j, k = 0;
 		int tmp = -1;
 		System.out.println(binaryArray.length());
@@ -546,7 +553,7 @@ public class urlService {
 			System.out.println("i = " + i);
 			j = Byte.parseByte(binaryArray.substring(i, i + 7), 2);
 			k = Byte.parseByte(binaryArray.substring(i + 7, i + 14), 2);
-			 
+
 			System.out.println(j +", " + k);
 			if (imageArray[j][k] < 255) {
 				imageArray[j][k] += 1;
@@ -558,9 +565,9 @@ public class urlService {
 		info.setImageArray(imageArray);
 	}
 
-	
 
-	
+
+
 
 	public void pythonExec() {
 
