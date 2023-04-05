@@ -32,7 +32,7 @@ public class mainController {
 	private urlService urlService;
 
 
-
+	//test
 	@RequestMapping("/main")
 	@ResponseBody
 	public String hello() {
@@ -42,7 +42,7 @@ public class mainController {
 
 	@GetMapping("/input_URL")
 	public String inputURL() {
-//		model.addAttribute("url_info", new String());
+
 		return "input_URL";
 	}	
 	

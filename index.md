@@ -1,37 +1,56 @@
-## Welcome to GitHub Pages
+# 프로젝트 명 : Malware Checker
 
-You can use the [editor on GitHub](https://github.com/kookmin-sw/cap-template/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## 목차
 
-### Markdown
+1. [프로젝트 소개](##-1.-프로젝트-소개)
+2. [소개 영상](##-2.-소개-영상)
+3. [팀 소개](##-3.-팀-소개)
+4. [사용법](##-4.-사용법)
+5. [기타](##-5.-기타)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+---
 
-```markdown
-Syntax highlighted code block
+## 1. 프로젝트 소개
 
-# Header 1
-## Header 2
-### Header 3
+1. 주제 : 악성 파일을 검사 해주는 웹 페이지 개발
 
-- Bulleted
-- List
+2. 주요 기술 : PE 파일 분석, 악성 파일 분석
 
-1. Numbered
-2. List
+3. 진행 방향 
+ - Spring Framework로 웹 페이지 개발(3 Tier-Architecture)
+ - upload한 파일들을 분석하여 패킹 탐지 및 언 패킹 
+ - Tensorflow로 Deep Learning을 construct 하여 악성 파일 검사 
 
-**Bold** and _Italic_ and `Code` text
+---
 
-[Link](url) and ![Image](src)
-```
+## 2. 소개 영상
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+추가 예정
 
-### Jekyll Themes
+---
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/kookmin-sw/cap-template/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## 3. 팀 소개
 
-### Support or Contact
+팀 : 21조 (kookmin-sw/capstone-2023-21)
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+직급 | 이름 | 학번 | 메일 | 역할 |
+---|---|---|---|---|
+팀장 | 유남규 | ****2842 | 20152842@kookmin.ac.kr | AI, Malware detection
+팀원 | 김용호 | ****1588 | dydgh0608@kookmin.ac.kr | Frontend, Backend, PE file analyze
+
+---
+
+## 4. 사용법
+
+1. Repositories에서 프로젝트를 다운 받습니다.
+2. 압축을 해제하고 프로젝트를 Spring을 통해 실행
+3. 웹사이트에 'http://localhost:8090/input_URL' 입력
+4. 파일 업로드를 클릭하여 파일 선택
+5. submit 버튼을 클릭하여 결과 확인 
+
+---
+
+## 5. 기타
+
+---
