@@ -524,7 +524,7 @@ public class urlService {
 			System.out.println(PEbody);
 
 			String malware = deeplearning(PEbody);
-			System.out.println(malware);
+			System.out.println("결과 : " + malware);
 			malware_result.add(malware);
 
 
