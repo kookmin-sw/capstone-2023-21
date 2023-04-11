@@ -1,4 +1,3 @@
-from PIL import image
 import sys
 
 def binary(input_str):
