@@ -14,6 +14,7 @@ import lastcoder.model.info;
 import lastcoder.service.urlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ import lastcoder.model.info;
 import lastcoder.service.urlService;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class mainController {
@@ -48,7 +50,7 @@ public class mainController {
 	
 	@PostMapping("/receive_URL")
 	@ResponseBody
-	public info receiveURL(MultipartHttpServletRequest multipartFile) throws IOException {
+	public ModelAndView receiveURL(MultipartHttpServletRequest multipartFile, Model model) throws IOException {
 
 		List<MultipartFile> fileinputlist = multipartFile.getFiles("multipartFile");
 		List<File> PEfile = new ArrayList<File>();
@@ -77,7 +79,27 @@ public class mainController {
 
 		}
 		// commit test
-		return urlService.byteArrayToBinary(PEfile);
+		info d = urlService.byteArrayToBinary(PEfile);
+
+		List<String> nList = new ArrayList<>();
+		List<String> mList = new ArrayList<>();
+		List<String> pList = new ArrayList<>();
+		List<String> uList = new ArrayList<>();
+
+
+		nList = d.getFilenamelist();
+		mList = d.getMalware_result();
+		pList = d.getPacking_result();
+		uList = d.getUnpacking_result();
+
+		ModelAndView modelAndView = new ModelAndView("receive_URL");
+
+		modelAndView.addObject("nList",nList);
+		modelAndView.addObject("pList",pList);
+		modelAndView.addObject("uList",uList);
+		modelAndView.addObject("mList",mList);
+
+		return modelAndView;
 	}
 	
 	

@@ -104,12 +104,12 @@ public class urlService {
 		}
 
 		// 출력
-		for(int row = 0; row < hxdarray.length; row++){
-			for(int col = 0; col < hxdarray[row].length; col++){
-				System.out.print(hxdarray[row][col] + " ");
-			}
-			System.out.println();
-		}
+		//for(int row = 0; row < hxdarray.length; row++){
+		//	for(int col = 0; col < hxdarray[row].length; col++){
+		//		System.out.print(hxdarray[row][col] + " ");
+		//	}
+		//	System.out.println();
+		//}
 
 		return hxdarray;
 
@@ -175,10 +175,10 @@ public class urlService {
 	}
 
 	// deeplearning에 PE body데이터를 넘겨주는 함수
-	public String deeplearning(String body) {
+	public String deeplearning(String path) {
 		String outputStr = null;
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder("python", "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\src\\main\\java\\lastcoder\\service\\file.py", body);
+			ProcessBuilder processBuilder = new ProcessBuilder("python", "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\src\\main\\java\\lastcoder\\service\\file.py", path);
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 
@@ -200,16 +200,24 @@ public class urlService {
 	public info byteArrayToBinary(List<File> list) throws IOException {
 
 		String location = "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\quarantine";
+		int nfile = 0;
 		//File file = new File(file_loaction);
 //		 System.out.println("byte_encoding : " + fileToBinary(file));
 		info = new info();
 		info.setFlist(list);
 
 		// 삭제할 파일들
-		List<String> deletelist = new ArrayList<String>();
-
+		List<String> delete_list = new ArrayList<String>();
+		// 파일 이름을 저장
+		List<String> name_list = new ArrayList<String>();
+		// 파일 패킹 결과 저장 결과
+		List<String> packing_list = new ArrayList<String>();
+		// 언패킹 결과
+		List<String> unpacking_list = new ArrayList<String>();
 		// 악성코드 결과
-		List<String> malware_result = new ArrayList<String>();
+		List<String> malware_list = new ArrayList<String>();
+
+
 
 
 		for(int i=0; i < list.size(); i++){
@@ -218,12 +226,17 @@ public class urlService {
 			//info.setBase64_array(new String(base64Enc(fileToByteArray(filelocation))));
 			//info.setByteArray(fileToByteArray(filelocation));
 
-			deletelist.add(filelocation);
+			// 삭제할 파일 추가
+			delete_list.add(filelocation);
+
+			// 이름 저장
+			String name_split [] = filelocation.split("\\\\");
+			String name = name_split[name_split.length-1];
+			name_list.add(name);
 
 			// 파일 바이너리화 & 16진수 데이터형 변환
 			String binaryfile = binaryEnc(fileToByteArray(filelocation));
 			String hxdresult = BinaryToHxd(binaryfile);
-
 
 			// 이중배열로 파일 16진수 데이터로 출력
 			String hxdarray[][] = HxdresultToArray(hxdresult);
@@ -366,8 +379,11 @@ public class urlService {
 			// packing file quarantine(write and entropy)
 			if(characteristics.equals("80") || characteristics.equals("A0") || characteristics.equals("C0") || characteristics.equals("E0")){
 
-				if(entropy > 6.85 && entropy < 7.99){
+				if(entropy > 6.85 && entropy < 8){
 					System.out.println("패킹 파일 입니다.");
+
+					// 패킹파일 추가
+					packing_list.add("패킹 파일입니다.");
 
 					// 언 패킹하기(UPX)
 					String packedFilePath = filelocation;
@@ -380,6 +396,9 @@ public class urlService {
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
 					}
+
+					// 언 패킹 파일 결과 저장
+					unpacking_list.add("언 패킹 성공");
 
 					//언 패킹 파일 바이너리화
 					String upx_binary =  binaryEnc(fileToByteArray(filelocation));
@@ -501,41 +520,56 @@ public class urlService {
 
 					characteristics = hxdarray[row][col];
 					System.out.println("파일 속성 : " + characteristics);
-
+					double entropy2 = EntryPointEntropy(filelocation, section_table_offset, section_table_size);
 
 				}
 				else if(entropy > 5.05 && entropy < 6.69){
+					packing_list.add("패킹 파일이 아닙니다.");
+					unpacking_list.add("언 패킹 완료");
 					System.out.println("패킹 파일이 아닙니다.");
 				}
 				else{
+					packing_list.add("미탐입니다.");
+					unpacking_list.add("언 패킹 완료");
 					System.out.println("패킹 파일인지 탐지하지 못했습니다.");
 				}
 			}
 			else{
+				packing_list.add("패킹 파일이 아닙니다.");
+				unpacking_list.add("언 패킹 완료");
 				System.out.println("패킹 파일이 아닙니다.");
 			}
 
 			// PE 파일의 body 추출(.text 데이터)
-			String PEbody = "";
+			nfile++;
+			String str_nfile = Integer.toString(nfile);
+			String PEbody_filepath = location + "//" + str_nfile + ".txt";
 			String[] filearray = hxdresult.split(" ");
+			FileOutputStream outputStream = new FileOutputStream(new File(PEbody_filepath));
 			for(int index = section_table_offset; index < section_table_size; index++){
-				PEbody = PEbody + filearray[index] + " ";
+				byte data = (byte) Integer.parseInt(filearray[index], 16);
+				outputStream.write(data);
 			}
-			System.out.println(PEbody);
+			outputStream.close();
+			delete_list.add(PEbody_filepath);
+			System.out.println();
 
-			String malware = deeplearning(PEbody);
+			// 악성코드 결과 저장
+			String malware = deeplearning(PEbody_filepath);
 			System.out.println("결과 : " + malware);
-			malware_result.add(malware);
-
-
+			malware_list.add(malware);
 
 		}
-
-
 
 		//info.setUrl_info(url_info);
 		//info.setFile_location(file_loaction);
 		//byteArrayToImage(info);
+
+		info.setDeletelist(delete_list);
+		info.setFilenamelist(name_list);
+		info.setPacking_result(packing_list);
+		info.setUnpacking_result(unpacking_list);
+		info.setMalware_result(malware_list);
 
 		return info;
 	}

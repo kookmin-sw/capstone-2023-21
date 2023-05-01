@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Malware Checker</title>
+</head>
+
+<body>
+    <h1>My List</h1>
+    <h3>이름</h3>
+    <ul>
+        <li th:each="item : ${nList}" th:text="${item}">Default item</li>
+    </ul>
+    <h3>패킹탐지결과</h3>
+    <ul>
+        <li th:each="item : ${pList}" th:text="${item}">Default item</li>
+    </ul>
+    <h3>언패킹결과</h3>
+    <ul>
+        <li th:each="item : ${uList}" th:text="${item}">Default item</li>
+    </ul>
+    <h3>악성코드</h3>
+    <ul>
+        <li th:each="item : ${mList}" th:text="${item}">Default item</li>
+    </ul>
+</body>
+</html>
