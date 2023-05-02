@@ -555,7 +555,7 @@ public class urlService {
 			System.out.println();
 
 			// 악성코드 결과 저장
-			String malware = deeplearning(PEbody_filepath);
+			String malware = deeplearning(filelocation);
 			System.out.println("결과 : " + malware);
 			malware_list.add(malware);
 
