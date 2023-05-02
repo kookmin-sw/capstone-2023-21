@@ -177,7 +177,10 @@ public class urlService {
 	// deeplearning에 PE body데이터를 넘겨주는 함수
 	public String deeplearning(String path) {
 		String outputStr = null;
+
 		try {
+			System.out.println("path : " + path);
+
 			ProcessBuilder processBuilder = new ProcessBuilder("python", "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\src\\main\\java\\lastcoder\\service\\file.py", path);
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
@@ -555,7 +558,7 @@ public class urlService {
 			System.out.println();
 
 			// 악성코드 결과 저장
-			String malware = deeplearning(PEbody_filepath);
+			String malware = deeplearning(filelocation);
 			System.out.println("결과 : " + malware);
 			malware_list.add(malware);
 
