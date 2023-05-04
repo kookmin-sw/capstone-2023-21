@@ -42,7 +42,7 @@ public class mainController {
 		return hi;
 	}
 
-	@GetMapping("/input_URL")
+	@RequestMapping("/input_URL")
 	public String inputURL() {
 
 		return "input_URL";

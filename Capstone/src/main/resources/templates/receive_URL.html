@@ -1,28 +1,93 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <meta charset="UTF-8">
     <title>Malware Checker</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <noscript><link rel="stylesheet" type="text/css" th:href="@{/css/noscript.css}"/></noscript>
+
+    <style>
+        table{ border-collapse : collapse; }  /*이중선 제거*/
+        th,td{
+            width: 100px;
+            height: 50px;
+            text-align: center;
+            border: 1px solid #000;
+
+            vertical-align: top;	/* 위 */
+            vertical-align: bottom;   /* 아래 */
+            vertical-align: middle;   /* 가운데 */
+        }
+    </style>
+
+    <script>
+        function submitForm() {
+            document.getElementById("myForm").submit();
+        }
+    </script>
+
 </head>
 
-<body>
-    <h1>My List</h1>
-    <h3>이름</h3>
-    <ul>
-        <li th:each="item : ${nList}" th:text="${item}">Default item</li>
-    </ul>
-    <h3>패킹탐지결과</h3>
-    <ul>
-        <li th:each="item : ${pList}" th:text="${item}">Default item</li>
-    </ul>
-    <h3>언패킹결과</h3>
-    <ul>
-        <li th:each="item : ${uList}" th:text="${item}">Default item</li>
-    </ul>
-    <h3>악성코드</h3>
-    <ul>
-        <li th:each="item : ${mList}" th:text="${item}">Default item</li>
-    </ul>
-</body>
+<body class="is-preload">
+
+<!-- Wrapper-->
+<div id="wrapper">
+
+    <!-- Nav -->
+    <form id="myForm" th:action="@{/input_URL}" method="post">
+    <nav id="nav">
+        <a href="#" class="icon solid fa-tasks"><span>Result</span></a>
+        <a href="#" onclick="submitForm()" class="icon solid fa-undo"><span>Home</span></a>
+    </nav>
+    </form>
+
+        <!-- Main -->
+        <div id="main">
+
+            <!-- Me -->
+            <article id="home" class="panel">
+                <header>
+                    <h1>파일 분석 결과</h1>
+                </header>
+                <br>
+                <section>
+                <table>
+                    <thead>
+
+                        <tr>
+                            <th scope="col">이름</th>
+                            <th scope="col">패킹탐지 결과</th>
+                            <th scope="col">언 패킹 결과</th>
+                            <th scope="col">악성코드</th>
+                        </tr>
+                    </thead>
+                        <tbody>
+                            <tr th:each="item, i : ${nList}">
+                                <td th:text="${nList[i.index]}">Default item</td>
+                                <td th:text="${pList[i.index]}">Default item</td>
+                                <td th:text="${uList[i.index]}">Default item</td>
+                                <td th:text="${mList[i.index]}">Default item</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+                </article>
+
+                <!-- Footer -->
+                <div id="footer">
+                    <ul class="copyright">
+                        <li>Kookmin-sw/capstone-2023</li><li>Team 21</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/browser.min.js}"></script>
+    <script th:src="@{/js/breakpoints.min.js}"></script>
+    <script th:src="@{/js/util.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    </body>
+
 </html>
