@@ -229,8 +229,6 @@ public class urlService {
 		List<String> malware_list = new ArrayList<String>();
 
 
-
-
 		for(int i=0; i < list.size(); i++){
 
 			String filelocation = list.get(i).toString();
@@ -306,7 +304,7 @@ public class urlService {
 			if(checkINH_location.equals("50450000")){
 				checkINH = true;
 			}
-			System.out.println(checkINH + " " + "INH 시작위치입니다.");
+			System.out.println(checkINH + " " + "INH 시작위치");
 			System.out.println(INH_location_index);
 
 			// INH_location_index 끝위치
@@ -403,13 +401,18 @@ public class urlService {
 
 					try{
 						Process process = pb.start();
-						process.waitFor();
+						int exitValue = process.waitFor();
+						if(exitValue == 0){
+							unpacking_list.add("Sccuess");
+						}
+						else{
+							unpacking_list.add("Fail");
+						}
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
+					} catch(IOException e){
+						throw  new RuntimeException(e);
 					}
-
-					// 언 패킹 파일 결과 저장
-					unpacking_list.add("Success");
 
 					//언 패킹 파일 바이너리화
 					String upx_binary =  binaryEnc(fileToByteArray(filelocation));
