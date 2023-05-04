@@ -198,12 +198,20 @@ public class urlService {
 
 	}
 
+	// 업로드 파일 삭제 함수
+	public void deleteFileUpload(List deletelist){
+		for(int i = 0; i < deletelist.size(); i++){
+			File file = new File(deletelist.get(i).toString());
+			file.delete();
+		}
+	}
+
 
 	// 파일 바이너리화
 	public info byteArrayToBinary(List<File> list) throws IOException {
 
 		String location = "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\quarantine";
-		int nfile = 0;
+		//int nfile = 0;
 		//File file = new File(file_loaction);
 //		 System.out.println("byte_encoding : " + fileToBinary(file));
 		info = new info();
@@ -386,7 +394,7 @@ public class urlService {
 					System.out.println("패킹 파일 입니다.");
 
 					// 패킹파일 추가
-					packing_list.add("패킹 파일입니다.");
+					packing_list.add("O");
 
 					// 언 패킹하기(UPX)
 					String packedFilePath = filelocation;
@@ -401,7 +409,7 @@ public class urlService {
 					}
 
 					// 언 패킹 파일 결과 저장
-					unpacking_list.add("언 패킹 성공");
+					unpacking_list.add("Success");
 
 					//언 패킹 파일 바이너리화
 					String upx_binary =  binaryEnc(fileToByteArray(filelocation));
@@ -527,35 +535,35 @@ public class urlService {
 
 				}
 				else if(entropy > 5.05 && entropy < 6.69){
-					packing_list.add("패킹 파일이 아닙니다.");
-					unpacking_list.add("언 패킹 완료");
+					packing_list.add("X");
+					unpacking_list.add("-");
 					System.out.println("패킹 파일이 아닙니다.");
 				}
 				else{
-					packing_list.add("미탐입니다.");
-					unpacking_list.add("언 패킹 완료");
+					packing_list.add("?");
+					unpacking_list.add("-");
 					System.out.println("패킹 파일인지 탐지하지 못했습니다.");
 				}
 			}
 			else{
-				packing_list.add("패킹 파일이 아닙니다.");
-				unpacking_list.add("언 패킹 완료");
+				packing_list.add("X");
+				unpacking_list.add("-");
 				System.out.println("패킹 파일이 아닙니다.");
 			}
 
 			// PE 파일의 body 추출(.text 데이터)
-			nfile++;
-			String str_nfile = Integer.toString(nfile);
-			String PEbody_filepath = location + "//" + str_nfile + ".txt";
-			String[] filearray = hxdresult.split(" ");
-			FileOutputStream outputStream = new FileOutputStream(new File(PEbody_filepath));
-			for(int index = section_table_offset; index < section_table_size; index++){
-				byte data = (byte) Integer.parseInt(filearray[index], 16);
-				outputStream.write(data);
-			}
-			outputStream.close();
-			delete_list.add(PEbody_filepath);
-			System.out.println();
+			//nfile++;
+			//String str_nfile = Integer.toString(nfile);
+			//String PEbody_filepath = location + "//" + str_nfile + ".txt";
+			//String[] filearray = hxdresult.split(" ");
+			//FileOutputStream outputStream = new FileOutputStream(new File(PEbody_filepath));
+			//for(int index = section_table_offset; index < section_table_size; index++){
+			//	byte data = (byte) Integer.parseInt(filearray[index], 16);
+			//	outputStream.write(data);
+			//}
+			//outputStream.close();
+			//delete_list.add(PEbody_filepath);
+			//System.out.println();
 
 			// 악성코드 결과 저장
 			String malware = deeplearning(filelocation);
@@ -573,6 +581,9 @@ public class urlService {
 		info.setPacking_result(packing_list);
 		info.setUnpacking_result(unpacking_list);
 		info.setMalware_result(malware_list);
+
+		//업로드 파일 삭제
+		deleteFileUpload(delete_list);
 
 		return info;
 	}
