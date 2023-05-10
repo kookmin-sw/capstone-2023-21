@@ -30,7 +30,6 @@ public class mainController {
 
 	// PE파일 분류 함수
 	public void checked_PEfile(String fileName, String upload_filePath, List PEfileList, MultipartFile inputFile){
-
 		// PE파일 확장자들을 저장한 리스트
 		List<String> pefile_extensions = Arrays.asList("exe", "src", "dll", "ocx", "cpl", "drv", "sys", "vxd", "obj");
 		// 경로 split
@@ -52,9 +51,7 @@ public class mainController {
 			}catch (IOException e){
 				e.printStackTrace();
 			}
-
 		}
-
 	}
 
 	@RequestMapping("/main")
@@ -73,7 +70,6 @@ public class mainController {
 	@PostMapping("/receive_URL")
 	@ResponseBody
 	public ModelAndView receiveURL(MultipartHttpServletRequest multipartFile) throws IOException {
-
 		// 입력받은 파일들을 저장한 리스트
 		List<MultipartFile> fileinputlist = multipartFile.getFiles("multipartFile");
 		// PE 파일들을 저장하는 리스트
@@ -90,9 +86,7 @@ public class mainController {
 			String fileName = fileinputlist.get(i).getOriginalFilename();
 			// PE파일 분류
 			checked_PEfile(fileName, upload_filePath, PEfileList, fileinputlist.get(i));
-
 		}
-
 		// PE파일들 분석
 		info d = urlService.byteArrayToBinary(PEfileList);
 
@@ -113,6 +107,4 @@ public class mainController {
 
 		return modelAndView;
 	}
-	
-	
 }
