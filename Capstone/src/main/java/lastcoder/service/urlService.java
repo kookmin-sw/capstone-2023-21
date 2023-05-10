@@ -28,15 +28,21 @@ public class urlService {
 	@Autowired
 	private info info;
 
-	public byte[] base64Enc(byte[] byteArray) {
-		return Base64.encodeBase64(byteArray, false);
+	// 업로드 파일 삭제 함수
+	public void deleteFileUpload(List deletelist){
+		for(int i = 0; i < deletelist.size(); i++){
+			File file = new File(deletelist.get(i).toString());
+			file.delete();
+		}
 	}
+
 
 	public String binaryEnc(byte[] byteArray) {
 		String binaryStr = new BigInteger(1, byteArray).toString(2);
-		return binaryStr;
 
+		return binaryStr;
 	}
+
 
 	public byte[] fileToByteArray(String location) {
 		String out = new String();
@@ -102,17 +108,7 @@ public class urlService {
 				hxdarray[row][col] = hexarray[row*16 + col];
 			}
 		}
-
-		// 출력
-		//for(int row = 0; row < hxdarray.length; row++){
-		//	for(int col = 0; col < hxdarray[row].length; col++){
-		//		System.out.print(hxdarray[row][col] + " ");
-		//	}
-		//	System.out.println();
-		//}
-
 		return hxdarray;
-
 	}
 
 	// 바이너리 파일 16진수 변환
@@ -167,12 +163,6 @@ public class urlService {
 		return entropy;
 	}
 
-	//multipartFile 객체를 File 객체로 변환
-	public File multipartFileToFile(MultipartFile multipartFile) throws IOException {
-		File file = new File(multipartFile.getOriginalFilename());
-		multipartFile.transferTo(file);
-		return file;
-	}
 
 	// deeplearning에 PE body데이터를 넘겨주는 함수
 	public String deeplearning(String path) {
@@ -196,14 +186,6 @@ public class urlService {
 		return outputStr;
 
 
-	}
-
-	// 업로드 파일 삭제 함수
-	public void deleteFileUpload(List deletelist){
-		for(int i = 0; i < deletelist.size(); i++){
-			File file = new File(deletelist.get(i).toString());
-			file.delete();
-		}
 	}
 
 

@@ -78,8 +78,10 @@ public class mainController {
 		List<MultipartFile> fileinputlist = multipartFile.getFiles("multipartFile");
 		// PE 파일들을 저장하는 리스트
 		List<File> PEfileList = new ArrayList<File>();
+		// 현재 위치 경로
+		String currentDir = System.getProperty("user.dir");
 		// 업로드할 파일 경로
-		String upload_filePath = "C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\quarantine";
+		String upload_filePath = currentDir + File.separator + "Capstone\\quarantine";
 
 		// 입력받은 파일들의 이름 추출 및 PE파일 분류
 		for(int i =0; i< fileinputlist.size(); i++){
