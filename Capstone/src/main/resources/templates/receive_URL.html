@@ -19,6 +19,27 @@
             vertical-align: bottom;   /* 아래 */
             vertical-align: middle;   /* 가운데 */
         }
+        .yellow-text {
+            color: yellow;
+            font-weight: bold;
+        }
+        .green-text {
+            color: green;
+            font-weight: bold;
+        }
+        .red-text {
+            color: red;
+            font-weight: bold;
+        }
+        .black-text{
+            color: black;;
+            font-weight: bold;
+        }
+        .white-text{
+            color: white;
+            font-weight: bold;
+            background-color: black;
+        }
     </style>
 
     <script>
@@ -56,17 +77,17 @@
                     <thead>
 
                         <tr>
-                            <th scope="col">이름</th>
-                            <th scope="col">패킹탐지 결과</th>
-                            <th scope="col">언 패킹 결과</th>
-                            <th scope="col">악성코드</th>
+                            <th scope="col" class="white-text">이름</th>
+                            <th scope="col" class="white-text">패킹탐지 결과</th>
+                            <th scope="col" class="white-text">언 패킹 결과</th>
+                            <th scope="col" class="white-text">악성코드</th>
                         </tr>
                     </thead>
                         <tbody>
                             <tr th:each="item, i : ${nList}">
-                                <td th:text="${nList[i.index]}">Default item</td>
-                                <td th:text="${pList[i.index]}">Default item</td>
-                                <td th:text="${uList[i.index]}">Default item</td>
+                                <td th:text="${nList[i.index]}" th:class="black-text">Default item</td>
+                                <td th:text="${pList[i.index]}" th:class="${pList[i.index] == '?' ? 'yellow-text' : pList[i.index] == 'X' ? 'green-text' : pList[i.index] == 'O' ? 'red-text' : ''}">Default item</td>
+                                <td th:text="${uList[i.index]}" th:class="${uList[i.index] == '-' ? 'black-text' : uList[i.index] == 'Sccuess' ? 'green-text' : uList[i.index] == 'Fail' ? 'red-text' : ''}">Default item</td>
                                 <td th:text="${mList[i.index]}">Default item</td>
                             </tr>
                         </tbody>
