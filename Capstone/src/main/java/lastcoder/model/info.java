@@ -39,5 +39,7 @@ public class info {
 	private List<String> packing_result;
 	// 언패킹 결과 목록
 	private List<String> unpacking_result;
+	// 설명에 대한 목록
+	private List<String> describelist;
 
 }

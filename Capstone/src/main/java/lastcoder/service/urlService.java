@@ -251,6 +251,8 @@ public class urlService {
 		List<String> unpacking_list = new ArrayList<String>();
 		// 악성코드 결과를 저장하는 리스트
 		List<String> malware_list = new ArrayList<String>();
+		// 설명을 저장하는 리스트
+		List<String> describe_list = new ArrayList<String>();
 
 		for(int i=0; i < PEfile_list.size(); i++){
 
@@ -279,6 +281,7 @@ public class urlService {
 			String malware = deeplearning(filelocation);
 			System.out.println("결과 : " + malware);
 			malware_list.add(malware);
+			describe_list.add("패킹 파일인지 확인이 어려워 정확한 악성코드 탐지 및 분석이 어렵습니다.");
 
 		}
 
@@ -287,6 +290,7 @@ public class urlService {
 		info.setPacking_result(packing_list);
 		info.setUnpacking_result(unpacking_list);
 		info.setMalware_result(malware_list);
+		info.setDescribelist(describe_list);
 
 		//업로드 파일 삭제
 		deleteFileUpload(delete_list);

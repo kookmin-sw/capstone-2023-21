@@ -95,6 +95,7 @@ public class mainController {
 		List<String> mList = d.getMalware_result();
 		List<String> pList = d.getPacking_result();
 		List<String> uList = d.getUnpacking_result();
+		List<String> dList = d.getDescribelist();
 
 		// 클라이언트에게 보여줄 뷰(view) 생성
 		ModelAndView modelAndView = new ModelAndView("receive_URL");
@@ -104,6 +105,7 @@ public class mainController {
 		modelAndView.addObject("pList",pList);
 		modelAndView.addObject("uList",uList);
 		modelAndView.addObject("mList",mList);
+		modelAndView.addObject("dList",dList);
 
 		return modelAndView;
 	}
