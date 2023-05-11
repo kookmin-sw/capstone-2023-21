@@ -281,6 +281,8 @@ public class urlService {
 			String malware = deeplearning(filelocation);
 			System.out.println("결과 : " + malware);
 			malware_list.add(malware);
+
+			// 분석 결과에 대한 내용을 저장
 			describe_list.add("패킹 파일인지 확인이 어려워 정확한 악성코드 탐지 및 분석이 어렵습니다.");
 
 		}
