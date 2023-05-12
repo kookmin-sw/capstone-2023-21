@@ -40,6 +40,12 @@
             font-weight: bold;
             background-color: black;
         }
+        .white-text-weight{
+            color: white;
+            font-weight: bold;
+            background-color: black;
+            width: 300px;
+        }
     </style>
 
     <script>
@@ -71,7 +77,6 @@
                 <header>
                     <h1>파일 분석 결과</h1>
                 </header>
-                <br>
                 <section>
                 <table>
                     <thead>
@@ -90,6 +95,30 @@
                                 <td th:text="${uList[i.index]}" th:class="${uList[i.index] == '-' ? 'black-text' : uList[i.index] == 'Sccuess' ? 'green-text' : uList[i.index] == 'Fail' ? 'red-text' : ''}">Default item</td>
                                 <td th:text="${mList[i.index]}">Default item</td>
                             </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                </br>
+
+                <header>
+                    <h1>분석 결과 설명</h1>
+                </header>
+
+                <section>
+                    <table>
+                        <thead>
+
+                        <tr>
+                            <th scope="col" class="white-text">이름</th>
+                            <th scope="col" class="white-text-weight">설명</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item, i : ${nList}">
+                            <td th:text="${nList[i.index]}" th:class="black-text">Default item</td>
+                            <td th:text="${dList[i.index]}" th:class="black-text" style="text-align: left">Default item</td>
+                        </tr>
                         </tbody>
                     </table>
                 </section>

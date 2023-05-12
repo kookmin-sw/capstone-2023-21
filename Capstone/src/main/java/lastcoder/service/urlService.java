@@ -226,6 +226,34 @@ public class urlService {
 	}
 
 
+	// 분석결과를 저장하는 함수
+	public void save_analysis_result(String packing_result, String unpacking_result, String malware_result, List describe_list){
+		if (packing_result.equals("O")){
+			if (unpacking_result.equals("Sccuess")){
+				if(malware_result.equals("악성코드")){
+					describe_list.add("악성코드 입니다.");
+				}
+				else{
+					describe_list.add("안전한 파일입니다.");
+				}
+			}
+			else{
+				describe_list.add("언 패킹이 실패하여 정확한 악성코드 탐지가 어렵습니다.");
+			}
+		}
+		else if (packing_result.equals("?")){
+			describe_list.add("패킹 파일인지 확인이 어려워 정확한 악성코드 탐지가 어렵습니다.");
+		}
+		else{
+			if(malware_result.equals("악성코드")){
+				describe_list.add("악성코드 입니다.");
+			}
+			else{
+				describe_list.add("안전한 파일입니다.");
+			}
+		}
+	}
+
 	// 업로드 파일 삭제 함수
 	public void deleteFileUpload(List deletelist){
 		for(int i = 0; i < deletelist.size(); i++){
@@ -283,7 +311,7 @@ public class urlService {
 			malware_list.add(malware);
 
 			// 분석 결과에 대한 내용을 저장
-			describe_list.add("패킹 파일인지 확인이 어려워 정확한 악성코드 탐지 및 분석이 어렵습니다.");
+			save_analysis_result(packing_list.get(i), unpacking_list.get(i), malware_list.get(i), describe_list);
 
 		}
 
