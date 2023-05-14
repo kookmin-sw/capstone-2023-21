@@ -203,8 +203,8 @@ public class urlService {
 	}
 
 
-	// deeplearning에 PE body데이터를 넘겨주는 함수
-	public String deeplearning(String path) {
+	// deeplearning에 파일경로를 넘겨주는 함수
+	public String load_model_from_file(String path) {
 		String outputStr = null;
 
 		try {
@@ -226,16 +226,36 @@ public class urlService {
 	}
 
 
+	// 악성코드 결과를 저장하는 함수
+	public void save_malware_result(String packing_result, String unpacking_result, String malware, List malware_list){
+		// 악성코드 종류를 저장한 리스트
+		List<String> mw = Arrays.asList("Ramnit", "Lollipop", "Kelihos_ver3", "Vundo", "Simda", "Tracur", "Kelihos_ver1", "Obfuscator.ACY", "Gatak");
+
+		// 패킹 탐지결과가 미탐 or 언 패킹이 실패했을 때 악성코드 탐지 결과는 불 필요하다
+		if(packing_result.equals("?") || unpacking_result.equals("Fail")){
+			malware_list.add("?");
+			return;
+		}
+
+		// 악성코드 결과확인
+		if(mw.contains(malware)){
+			malware_list.add(malware);
+		}
+		else{
+			malware_list.add("X");
+		}
+	}
+
+
 	// 분석결과를 저장하는 함수
 	public void save_analysis_result(String packing_result, String unpacking_result, String malware_result, List describe_list){
+		// 패킹 결과
 		if (packing_result.equals("O")){
+			// 언 패킹 결과
 			if (unpacking_result.equals("Sccuess")){
-				if(malware_result.equals("악성코드")){
-					describe_list.add("악성코드 입니다.");
-				}
-				else{
-					describe_list.add("안전한 파일입니다.");
-				}
+				// 악성코드 결과
+				String describe = malware_describe(malware_result);
+				describe_list.add(describe);
 			}
 			else{
 				describe_list.add("언 패킹이 실패하여 정확한 악성코드 탐지가 어렵습니다.");
@@ -245,14 +265,38 @@ public class urlService {
 			describe_list.add("패킹 파일인지 확인이 어려워 정확한 악성코드 탐지가 어렵습니다.");
 		}
 		else{
-			if(malware_result.equals("악성코드")){
-				describe_list.add("악성코드 입니다.");
-			}
-			else{
-				describe_list.add("안전한 파일입니다.");
-			}
+			String describe = malware_describe(malware_result);
+			describe_list.add(describe);
 		}
 	}
+
+
+	// 악성코드 결과에 대한 설명을 저장하는 함수
+	public String malware_describe(String malware_result) {
+		switch (malware_result) {
+			case "Ramnit":
+				return "백도어를 통해 공격자가 원하는 정보를 전송하고 다수의 파일에 접근하여 악의적인 행위를 하는 악성코드입니다.";
+			case "Lollipop":
+				return "사용자의 동의 없이 광고를 클릭하도록 유도하여 수익을 얻는 행위를 수행하는 악성코드입니다.";
+			case "Kelihos_ver3":
+				return "Windows 운영체제를 대상으로 한 좀비 네트워크 구축 및 스팸 메일 전송 등의 악성 행위를 수행하는 트로이목마 바이러스입니다.";
+			case "Vundo":
+				return "Windows 운영체제에서 동작하는 백도어 트로이목마로, 광고 클릭 유도 및 개인정보 탈취 등의 악성 행위를 수행하는 악성코드입니다.";
+			case "Simda":
+				return "웹사이트 감염과 악성 파일 다운로드를 통해 컴퓨터에 침투하여 좀비 네트워크를 형성하고, 이를 이용한 악성코드 배포 및 개인정보 탈취 등의 악성 행위를 수행하는 트로이목마 바이러스입니다.";
+			case "Tracur":
+				return "웹사이트 감염 및 스팸 메일을 통해 사용자의 컴퓨터에 침투하여 온라인 금융 거래 정보를 탈취하거나 악성 광고를 보여주는 등의 악성 행위를 수행하는 트로이목마 바이러스입니다.";
+			case "Kelihos_ver1":
+				return "Windows 운영체제에서 동작하는 좀비 네트워크를 구축하여 스팸 메일 전송, DDoS 공격 등의 악성 행위를 수행하는 트로이목마 바이러스입니다.";
+			case "Obfuscator.ACY":
+				return "코드 난독화 기술을 사용하여 악성 코드를 숨기고 탐지를 회피하는 기능을 수행하는 트로이목마 바이러스입니다.";
+			case "Gatak":
+				return "유저의 웹 브라우저에서 정보를 탈취하여 백도어를 설치하거나 악성 광고를 보여주는 등의 악성 행위를 수행하는 트로이목마 바이러스";
+			default:
+				return "탐지된 악성코드가 없습니다.";
+		}
+	}
+
 
 	// 업로드 파일 삭제 함수
 	public void deleteFileUpload(List deletelist){
@@ -305,10 +349,10 @@ public class urlService {
 			// 파일을 분석하여 패킹 결과와 언패킹 결과를 알아내는 함수
 			detectPackAndUnpack(filelocation, hxdarray, packing_list, unpacking_list);
 
-			// 악성코드 탐지 실행 및 결과 저장
-			String malware = deeplearning(filelocation);
-			System.out.println("결과 : " + malware);
-			malware_list.add(malware);
+			// 악성코드 탐지하기 위해 deeplearning에 파일경로를 넘겨주는 함수
+			String malware = load_model_from_file(filelocation);
+			// 악성코드 결과 저장
+			save_malware_result(packing_list.get(i), unpacking_list.get(i), malware, malware_list);
 
 			// 분석 결과에 대한 내용을 저장
 			save_analysis_result(packing_list.get(i), unpacking_list.get(i), malware_list.get(i), describe_list);

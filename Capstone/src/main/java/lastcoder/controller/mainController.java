@@ -25,8 +25,10 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class mainController {
 
+
 	@Autowired
 	private urlService urlService;
+
 
 	// PE파일 분류 함수
 	public void checked_PEfile(String fileName, String upload_filePath, List PEfileList, MultipartFile inputFile){
@@ -54,6 +56,7 @@ public class mainController {
 		}
 	}
 
+
 	@RequestMapping("/main")
 	@ResponseBody
 	public String hello() {
@@ -61,12 +64,14 @@ public class mainController {
 		return hi;
 	}
 
+
 	@RequestMapping("/input_URL")
 	public String inputURL() {
 
 		return "input_URL";
 	}	
-	
+
+
 	@PostMapping("/receive_URL")
 	@ResponseBody
 	public ModelAndView receiveURL(MultipartHttpServletRequest multipartFile) throws IOException {
@@ -87,6 +92,7 @@ public class mainController {
 			// PE파일 분류
 			checked_PEfile(fileName, upload_filePath, PEfileList, fileinputlist.get(i));
 		}
+
 		// PE파일들 분석
 		info d = urlService.byteArrayToBinary(PEfileList);
 
