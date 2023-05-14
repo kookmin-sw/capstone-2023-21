@@ -166,7 +166,7 @@ public class fileAnalyze
                 System.out.println("패킹 파일이 아닙니다.");
             }
             else{
-                packing_list.add("?");
+                packing_list.add("???");
                 unpacking_list.add("-");
                 System.out.println("패킹 파일인지 탐지하지 못했습니다.");
             }

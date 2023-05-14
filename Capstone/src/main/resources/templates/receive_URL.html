@@ -13,14 +13,14 @@
             width: 100px;
             height: 50px;
             text-align: center;
-            border: 1px solid #000;
+            border: 3px solid #000;
 
             vertical-align: top;	/* 위 */
             vertical-align: bottom;   /* 아래 */
             vertical-align: middle;   /* 가운데 */
         }
         .yellow-text {
-            color: yellow;
+            color: #FFA517;
             font-weight: bold;
         }
         .green-text {
@@ -32,19 +32,39 @@
             font-weight: bold;
         }
         .black-text{
-            color: black;;
+            color: black;
             font-weight: bold;
         }
         .white-text{
             color: white;
             font-weight: bold;
-            background-color: black;
+            background-color: midnightblue;
         }
         .white-text-weight{
             color: white;
             font-weight: bold;
-            background-color: black;
+            background-color: midnightblue;
             width: 300px;
+        }
+        .red-text-width{
+            color: red;
+            font-weight: bold;
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        .green-text-width{
+            color: green;
+            font-weight: bold;
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        .yellow-text-width{
+            color: #FFA517;
+            font-weight: bold;
+            text-align: left;
+            padding-left: 5px;
         }
     </style>
 
@@ -91,9 +111,9 @@
                         <tbody>
                             <tr th:each="item, i : ${nList}">
                                 <td th:text="${nList[i.index]}" th:class="black-text">Default item</td>
-                                <td th:text="${pList[i.index]}" th:class="${pList[i.index] == '?' ? 'yellow-text' : pList[i.index] == 'X' ? 'green-text' : pList[i.index] == 'O' ? 'red-text' : ''}">Default item</td>
+                                <td th:text="${pList[i.index]}" th:class="${pList[i.index] == '???' ? 'yellow-text' : pList[i.index] == 'X' ? 'green-text' : pList[i.index] == 'O' ? 'red-text' : ''}">Default item</td>
                                 <td th:text="${uList[i.index]}" th:class="${uList[i.index] == '-' ? 'black-text' : uList[i.index] == 'Sccuess' ? 'green-text' : uList[i.index] == 'Fail' ? 'red-text' : ''}">Default item</td>
-                                <td th:text="${mList[i.index]}">Default item</td>
+                                <td th:text="${mList[i.index]}" th:class="${mList[i.index] == '???' ? 'yellow-text' : mList[i.index] == 'X' ? 'green-text' : 'red-text'}">Default item</td>
                             </tr>
                         </tbody>
                     </table>
@@ -117,7 +137,7 @@
                         <tbody>
                         <tr th:each="item, i : ${nList}">
                             <td th:text="${nList[i.index]}" th:class="black-text">Default item</td>
-                            <td th:text="${dList[i.index]}" th:class="black-text" style="text-align: left">Default item</td>
+                            <td th:text="${dList[i.index]}" th:class="${dList[i.index] == '패킹 파일인지 확인이 어려워 정확한 악성코드 탐지가 어렵습니다.' ? 'yellow-text-width' : dList[i.index] == '언 패킹이 실패하여 정확한 악성코드 탐지가 어렵습니다.' ? 'yellow-text-width' : dList[i.index] == '탐지된 악성코드가 없습니다.' ? 'green-text-width' : 'red-text-width'}">Default item</td>
                         </tr>
                         </tbody>
                     </table>

@@ -232,8 +232,8 @@ public class urlService {
 		List<String> mw = Arrays.asList("Ramnit", "Lollipop", "Kelihos_ver3", "Vundo", "Simda", "Tracur", "Kelihos_ver1", "Obfuscator.ACY", "Gatak");
 
 		// 패킹 탐지결과가 미탐 or 언 패킹이 실패했을 때 악성코드 탐지 결과는 불 필요하다
-		if(packing_result.equals("?") || unpacking_result.equals("Fail")){
-			malware_list.add("?");
+		if(packing_result.equals("???") || unpacking_result.equals("Fail")){
+			malware_list.add("???");
 			return;
 		}
 
