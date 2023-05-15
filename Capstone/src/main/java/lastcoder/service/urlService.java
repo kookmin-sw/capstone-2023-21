@@ -23,6 +23,8 @@ public class urlService {
 
 	@Autowired
 	private info info;
+	
+//	
 
 	public byte[] base64Enc(byte[] byteArray) {
 		return Base64.encodeBase64(byteArray, false);
