@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 @Component
-public class info {
+public class file_info {
 
 	private String url_info;
 	private String file_location;
@@ -27,19 +27,17 @@ public class info {
 	private String hex_array;
 
 
-
-
 	// 삭제할 파일 목록
-	private List<String> deletelist;
+	private String deletelist;
 	// 파일 이름을 저장하는 목록
-	private List<String> filenamelist;
+	private String filenamelist;
 	// 파일 악성코드 결과 목록
-	private List<String> malware_result;
+	private String malware_result;
 	// 파일 패킹 탐지 결과 목록
-	private List<String> packing_result;
+	private String packing_result;
 	// 언패킹 결과 목록
-	private List<String> unpacking_result;
+	private String unpacking_result;
 	// 설명에 대한 목록
-	private List<String> describelist;
+	private String describelist;
 
 }
