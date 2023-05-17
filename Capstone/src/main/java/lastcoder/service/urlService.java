@@ -29,10 +29,44 @@ public class urlService {
 
 	@Autowired
 	private file_info file_info;
+	
+	@Autowired
 	private fileAnalyze fileAnalyze;
 
 	@Autowired
 	private PEFile PEFile;
+	
+	// PE파일 분류 함수
+	public List<File> checked_PEfile(List<MultipartFile> multiFile) throws IOException {
+
+		// PE파일 확장자들을 저장한 리스트
+		List<PEFile> peList = PEFile.getPEList();
+
+		List<File> PEfile_list = new ArrayList<>();
+		File uploadFile;
+
+		for (MultipartFile file : multiFile) {
+			String fileName = file.getOriginalFilename();
+			String[] extension = fileName.split("\\.");
+
+			if (peList.stream().anyMatch(ext -> ext.getExtension().equals(extension[extension.length - 1]))) {
+				// 업로드할 경로에 파일 생성
+				uploadFile = new File(upload_filePath + File.separator + fileName);
+				try {
+					// 입력 받은 파일을 지정한 경로(upload)에 저장
+					file.transferTo(uploadFile);
+					PEfile_list.add(uploadFile);
+				} catch (IllegalStateException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return PEfile_list;
+
+	}
+
 
 	// 현재 위치 경로
 	private final String currentDir = System.getProperty("user.dir");
@@ -123,36 +157,6 @@ public class urlService {
 		return hxdarray;
 	}
 
-	// PE파일 분류 함수
-	public List<File> checked_PEfile(List<MultipartFile> multiFile) throws IOException {
-
-		// PE파일 확장자들을 저장한 리스트
-		List<PEFile> peList = PEFile.getPEList();
-
-		List<File> PEfile_list = new ArrayList<>();
-		File uploadFile;
-
-		for (MultipartFile file : multiFile) {
-			String fileName = file.getOriginalFilename();
-			String[] extension = fileName.split("\\.");
-
-			if (peList.stream().anyMatch(ext -> ext.getExtension().equals(extension[extension.length - 1]))) {
-				// 업로드할 경로에 파일 생성
-				uploadFile = new File(upload_filePath + File.separator + fileName);
-				try {
-					// 입력 받은 파일을 지정한 경로(upload)에 저장
-					file.transferTo(uploadFile);
-					PEfile_list.add(uploadFile);
-				} catch (IllegalStateException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return PEfile_list;
-
-	}
 
 	public ModelAndView analyzeFile(List<File> PEfile_list) throws IOException {
 		// PE파일들 분석
