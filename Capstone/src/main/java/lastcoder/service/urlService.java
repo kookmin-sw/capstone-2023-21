@@ -29,13 +29,18 @@ public class urlService {
 
 	@Autowired
 	private file_info file_info;
-	
+
 	@Autowired
 	private fileAnalyze fileAnalyze;
 
 	@Autowired
 	private PEFile PEFile;
-	
+
+	// 현재 위치 경로
+	private final String currentDir = System.getProperty("user.dir");
+	// 업로드할 파일 경로
+	private final String upload_filePath = currentDir + File.separator + "Capstone\\quarantine";
+
 	// PE파일 분류 함수
 	public List<File> checked_PEfile(List<MultipartFile> multiFile) throws IOException {
 
@@ -67,44 +72,17 @@ public class urlService {
 
 	}
 
+	public List<byte[]> convertPEFileToBytes(List<File> PEfile_list) throws IOException {
 
-	// 현재 위치 경로
-	private final String currentDir = System.getProperty("user.dir");
-	// 업로드할 파일 경로
-	private final String upload_filePath = currentDir + File.separator + "Capstone\\quarantine";
-
-	// 파일 바이트 배열로 변환
-	public byte[] fileToByteArray(String location) {
-
-		FileInputStream fis = null;
-		byte[] fileArray = null;
-		System.out.println(location);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		try {
-			fis = new FileInputStream(location);
-			System.out.println(fis);
-
-		} catch (FileNotFoundException e) {
-			System.out.println("Exception position : FileUtil - fileToString(File file)");
-		}
-
-		int len = 0;
-		byte[] buf = new byte[1024];
-
-		try {
-			while ((len = fis.read(buf)) != -1) {
-				baos.write(buf, 0, len);
+		List<byte[]> dataList = new ArrayList<>();
+		for (File PEfile : PEfile_list) {
+			try (FileInputStream fis = new FileInputStream(PEfile)) {
+				byte[] data = new byte[(int) PEfile.length()];
+				fis.read(data);
+				dataList.add(data);
 			}
-
-			fileArray = baos.toByteArray();
-			fis.close();
-			baos.close();
-		} catch (IOException e) {
-			System.out.println("Exception position : FileUtil - fileToString(File file)");
 		}
-
-		return fileArray;
+		return dataList;
 	}
 
 	// 바이트 배열을 바이너리로 변환
@@ -144,19 +122,23 @@ public class urlService {
 	}
 
 	// 16진수 데이터 이중배열로 저장
-	public String[][] HxdresultToArray(String hxdresult) {
+	public List<String[][]> HxdresultToArray(List<String> hxd_list) {
 
-		String hexarray[] = hxdresult.split(" ");
-		String hxdarray[][] = new String[hexarray.length / 16][16];
+		List<String[][]> hxdArray = new ArrayList<>();
 
-		for (int row = 0; row < hxdarray.length; row++) {
-			for (int col = 0; col < hxdarray[row].length; col++) {
-				hxdarray[row][col] = hexarray[row * 16 + col];
+		for (String str : hxd_list) {
+			String hexarray[] = str.split(" ");
+			String hxdarray[][] = new String[hexarray.length / 16][16];
+
+			for (int row = 0; row < hxdarray.length; row++) {
+				for (int col = 0; col < hxdarray[row].length; col++) {
+					hxdarray[row][col] = hexarray[row * 16 + col];
+				}
 			}
+			hxdArray.add(hxdarray);
 		}
-		return hxdarray;
+		return hxdArray;
 	}
-
 
 	public ModelAndView analyzeFile(List<File> PEfile_list) throws IOException {
 		// PE파일들 분석
@@ -168,97 +150,82 @@ public class urlService {
 		return mv;
 	}
 
-	public List<byte[]> convertPEFileToBytes(List<File> PEfile_list) throws IOException {
-
-		List<byte[]> dataList = new ArrayList<>();
-		for (File PEfile : PEfile_list) {
-			try (FileInputStream fis = new FileInputStream(PEfile)) {
-				byte[] data = new byte[(int) PEfile.length()];
-				fis.read(data);
-				dataList.add(data);
-			}
-		}
-		return dataList;
-	}
-
 	// 파일을 분석하여 패킹 결과와 언패킹 결과를 알아내는 함수
-	public void detectPackAndUnpack(String filelocation, String[][] hxdarray, List packing_list, List unpacking_list)
-			throws IOException {
+	public void detectPackAndUnpack(List<String[][]> hxdarray) throws IOException {
 		// Image_dos_header
 		// e_magic 2byte로 "MZ" PE파일 확인
-		fileAnalyze.isPEFile(hxdarray);
+		for (String[][] str : hxdarray) {
+			fileAnalyze.isPEFile(str);
 
-		// e_lfanew로 IMAGE_NT_HEADERS 위치 찾기
-		int INH_location_index = fileAnalyze.findINHLocation(hxdarray);
-		// IMAGE_NT_HEADERS 위치 확인
-		fileAnalyze.checkINH(hxdarray, INH_location_index);
+			// e_lfanew로 IMAGE_NT_HEADERS 위치 찾기
+			int INH_location_index = fileAnalyze.findINHLocation(str);
+			// IMAGE_NT_HEADERS 위치 확인
+			fileAnalyze.checkINH(str, INH_location_index);
 
-		// INH_location_index 끝위치
-		int INH_finish_location_index = INH_location_index + 3;
+			// INH_location_index 끝위치
+			int INH_finish_location_index = INH_location_index + 3;
 
-		// PE파일 섹션 개수
-		int numberOfSection_location = INH_finish_location_index + 4;
-		int numberOfSection = fileAnalyze.getFieldData(hxdarray, numberOfSection_location, 2);
-		System.out.println("섹션 개수 : " + numberOfSection);
+			// PE파일 섹션 개수
+			int numberOfSection_location = INH_finish_location_index + 4;
+			int numberOfSection = fileAnalyze.getFieldData(str, numberOfSection_location, 2);
+			System.out.println("섹션 개수 : " + numberOfSection);
 
-		// Optional header 크기
-		int sizeOfOptionalHeader_location = INH_finish_location_index + 18;
-		int sizeOfOptionalHeader = fileAnalyze.getFieldData(hxdarray, sizeOfOptionalHeader_location, 2);
-		System.out.println("optionalheader 크기 : " + sizeOfOptionalHeader);
+			// Optional header 크기
+			int sizeOfOptionalHeader_location = INH_finish_location_index + 18;
+			int sizeOfOptionalHeader = fileAnalyze.getFieldData(str, sizeOfOptionalHeader_location, 2);
+			System.out.println("optionalheader 크기 : " + sizeOfOptionalHeader);
 
-		// Image_file_header 끝나는 지점
-		int Image_file_header_finish_location = INH_finish_location_index + 20;
+			// Image_file_header 끝나는 지점
+			int Image_file_header_finish_location = INH_finish_location_index + 20;
 
-		// BaseOfCode
-		int baseofcode_location = Image_file_header_finish_location + 24;
-		int baseofcode = fileAnalyze.getFieldData(hxdarray, baseofcode_location, 4);
-		System.out.println("base of code : " + baseofcode);
+			// BaseOfCode
+			int baseofcode_location = Image_file_header_finish_location + 24;
+			int baseofcode = fileAnalyze.getFieldData(str, baseofcode_location, 4);
+			System.out.println("base of code : " + baseofcode);
 
-		// ImageBase
-		int image_location = Image_file_header_finish_location + 32;
-		int imagebase = fileAnalyze.getFieldData(hxdarray, image_location, 4);
-		System.out.println("Imagebase : " + imagebase);
+			// ImageBase
+			int image_location = Image_file_header_finish_location + 32;
+			int imagebase = fileAnalyze.getFieldData(str, image_location, 4);
+			System.out.println("Imagebase : " + imagebase);
 
-		// Image_optional_header 끝나는 지점
-		int image_optional_header_finish = Image_file_header_finish_location + sizeOfOptionalHeader;
+			// Image_optional_header 끝나는 지점
+			int image_optional_header_finish = Image_file_header_finish_location + sizeOfOptionalHeader;
 
-		// basecode와 virtualAddress 같은 섹션 찾기
-		int section_number = fileAnalyze.findSection(baseofcode, numberOfSection, image_optional_header_finish,
-				hxdarray);
+			// basecode와 virtualAddress 같은 섹션 찾기
+			int section_number = fileAnalyze.findSection(baseofcode, numberOfSection, image_optional_header_finish,
+					str);
 
-		// sectiontable_name 확인하기
-		int section_table_name = image_optional_header_finish + (section_number * 40 + 8);
-		fileAnalyze.getSectionName(section_table_name, hxdarray);
+			// sectiontable_name 확인하기
+			int section_table_name = image_optional_header_finish + (section_number * 40 + 8);
+			fileAnalyze.getSectionName(section_table_name, str);
 
-		// section_table_offset
-		int section_table_offset_location = image_optional_header_finish + (section_number * 40 + 24);
-		int section_table_offset = fileAnalyze.getFieldData(hxdarray, section_table_offset_location, 4);
-		System.out.println("section table offset : " + section_table_offset);
+			// section_table_offset
+			int section_table_offset_location = image_optional_header_finish + (section_number * 40 + 24);
+			int section_table_offset = fileAnalyze.getFieldData(str, section_table_offset_location, 4);
+			System.out.println("section table offset : " + section_table_offset);
 
-		// section_table_size
-		int section_table_size_location = image_optional_header_finish + (section_number * 40 + 20);
-		int section_table_size = fileAnalyze.getFieldData(hxdarray, section_table_size_location, 4);
-		System.out.println("section table size : " + section_table_size);
+			// section_table_size
+			int section_table_size_location = image_optional_header_finish + (section_number * 40 + 20);
+			int section_table_size = fileAnalyze.getFieldData(str, section_table_size_location, 4);
+			System.out.println("section table size : " + section_table_size);
 
-		// characteristics
-		int characteristics_location = image_optional_header_finish + (section_number * 40 + 40);
-		String characteristics = fileAnalyze.getCharacteristics(hxdarray, characteristics_location);
-		System.out.println("파일 속성 : " + characteristics);
+			// characteristics
+			int characteristics_location = image_optional_header_finish + (section_number * 40 + 40);
+			String characteristics = fileAnalyze.getCharacteristics(str, characteristics_location);
+			System.out.println("파일 속성 : " + characteristics);
 
-		// 엔트로피
-		double entropy = EntryPointEntropy(filelocation, section_table_offset, section_table_size);
+			// 엔트로피
+			double entropy = EntryPointEntropy(section_table_offset, section_table_size);
 
-		// 패킹 파일 탐지
-		fileAnalyze.detectPackedFile(filelocation, characteristics, entropy, packing_list, unpacking_list);
+			// 패킹 파일 탐지
+			fileAnalyze.detectPackedFile(filelocation, characteristics, entropy, packing_list, unpacking_list);
+		}
 	}
 
 	// 진입점 섹션의 엔트로피 계산 함수
-	public double EntryPointEntropy(String filelocation, int offset, int size) throws IOException {
-		FileInputStream fis = new FileInputStream(filelocation);
-		fis.skip(offset);
+	public double EntryPointEntropy(int offset, int size) throws IOException {
+		
 		byte[] entryPointData = new byte[size];
-		fis.read(entryPointData);
-		fis.close();
 
 		// Step 2: 분리한 각 바이트 값의 등장 빈도를 계산합니다.
 		int[] freq = new int[256];
@@ -463,6 +430,40 @@ public class urlService {
 		System.out.println(binaryArray.length() - tmp);
 
 		file_info.setImageArray(imageArray);
+	}
+
+	// 파일 바이트 배열로 변환
+	public byte[] fileToByteArray(String location) {
+
+		FileInputStream fis = null;
+		byte[] fileArray = null;
+		System.out.println(location);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		try {
+			fis = new FileInputStream(location);
+			System.out.println(fis);
+
+		} catch (FileNotFoundException e) {
+			System.out.println("Exception position : FileUtil - fileToString(File file)");
+		}
+
+		int len = 0;
+		byte[] buf = new byte[1024];
+
+		try {
+			while ((len = fis.read(buf)) != -1) {
+				baos.write(buf, 0, len);
+			}
+
+			fileArray = baos.toByteArray();
+			fis.close();
+			baos.close();
+		} catch (IOException e) {
+			System.out.println("Exception position : FileUtil - fileToString(File file)");
+		}
+
+		return fileArray;
 	}
 
 	public void pythonExec() {
