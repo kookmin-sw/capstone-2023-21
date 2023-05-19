@@ -40,7 +40,7 @@ public class mainController {
 
 	@PostMapping("/receive_URL")
 	@ResponseBody
-	public ModelAndView receiveURL(MultipartHttpServletRequest multipartFile) throws IOException {
+	public void receiveURL(MultipartHttpServletRequest multipartFile) throws IOException {
 		// 입력받은 파일들을 저장한 리스트
 		List<MultipartFile> multiFile = multipartFile.getFiles("multipartFile");
 
@@ -50,10 +50,11 @@ public class mainController {
 		List<String> binaryStr_List = urlService.binaryEnc(Byte_list);
 		List<String> hxd_list = urlService.BinaryToHxd(binaryStr_List);
 		
-		List<String[][]> hxd_Array = urlService.HxdresultToArray(hxd_list);
+		urlService.HxdresultToArray(hxd_list);
 		//file_info_List 객체 List 완성
 		urlService.detectPackAndUnpack(urlService.get_file_info_List());
+		urlService.run_inference();
 		
-		return modelAndView;
+//		return modelAndView;
 	}
 }

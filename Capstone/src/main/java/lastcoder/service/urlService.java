@@ -35,6 +35,7 @@ public class urlService {
 	// 업로드할 파일 경로
 	private final static String upload_filePath = currentDir + File.separator + "Capstone\\upload_file_path";
 	private final static String unpacking_filePath = currentDir + File.separator + "Capstone\\unpacking_file_Path";
+	private final static String save_file_path = currentDir + File.separator + "Capstone\\save_file_path";
 
 	private final static List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
 
@@ -130,7 +131,7 @@ public class urlService {
 	}
 
 	// 16진수 데이터 이중배열로 저장
-	public List<String[][]> HxdresultToArray(List<String> hxd_list) {
+	public void HxdresultToArray(List<String> hxd_list) {
 
 		List<String[][]> hxdArray = new ArrayList<>();
 
@@ -154,7 +155,6 @@ public class urlService {
 		    
 		    fileInfo.setFile_Array(hxdData);
 		}
-		return hxdArray;
 	}
 
 	// 파일을 분석하여 패킹 결과와 언패킹 결과를 알아내는 함수
@@ -280,7 +280,7 @@ public class urlService {
 			processCd.waitFor(); // 현재 위치 변경 완료까지 대기
 
 			// 실행할 명령어 생성
-			String[] commandPy = { "python", "main.py", unpacking_filePath, "저장할 파일 경로" };
+			String[] commandPy = { "python", "main.py", unpacking_filePath, save_file_path };
 
 			// 명령어 실행
 			Process processPy = Runtime.getRuntime().exec(commandPy);
