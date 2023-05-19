@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import lastcoder.model.PEFile;
+import lastcoder.model.file_Name;
 import lastcoder.model.file_info;
 
 @Service
@@ -36,13 +37,19 @@ public class urlService {
 
 	@Autowired
 	private PEFile PEFile;
+	
+	@Autowired
+	private file_Name file_Name;
+	
+	private List<String> file_Name_List;
+	
 
 	// 현재 위치 경로
-	private final String currentDir = System.getProperty("user.dir");
+	private final static String currentDir = System.getProperty("user.dir");
 	// 업로드할 파일 경로
-	private final String upload_filePath = currentDir + File.separator + "Capstone\\quarantine";
+	private final static String upload_filePath = currentDir + File.separator + "Capstone\\quarantine";
 
-    private final List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
+    private final static List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
 
 	
 	// PE파일 분류 함수
@@ -52,6 +59,7 @@ public class urlService {
 		List<PEFile> peList = PEFile.getPEList();
 
 		List<File> PEfile_list = new ArrayList<>();
+		
 		File uploadFile;
 
 		for (MultipartFile file : multiFile) {
@@ -65,6 +73,7 @@ public class urlService {
 					// 입력 받은 파일을 지정한 경로(upload)에 저장
 					file.transferTo(uploadFile);
 					PEfile_list.add(uploadFile);
+					file_Name.set_List(fileName);
 				} catch (IllegalStateException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -213,7 +222,8 @@ public class urlService {
 
 			// 패킹 파일 탐지
 			if (write_characteristics.contains(characteristics) && entropy > 6.85 && entropy < 8) {
-				fileAnalyze.unPacking(currentDir, upload_filePath);
+				file_Name_List = file_Name.get_List();
+				fileAnalyze.unPacking(file_Name_List, currentDir, upload_filePath);
 			}
 		}
 	}
@@ -242,7 +252,39 @@ public class urlService {
 		return entropy;
 	}
 
-S
+
+	
+	public void run_inference() {
+		 try {
+	            // 아나콘다 가상머신 실행 및 현재 위치 변경
+	            String[] commandVm = {"conda", "activate", "python_VM"};  // 아나콘다 가상머신 실행 명령어
+	            Process processVm = Runtime.getRuntime().exec(commandVm);
+	            processVm.waitFor();  // 가상머신 실행 완료까지 대기
+	            
+	            // 현재 위치 변경
+	            String[] commandCd = {"cd", "D:\\Git\\capstone-2023-21\\Capstone"};  // 현재 위치 변경 명령어
+	            Process processCd = Runtime.getRuntime().exec(commandCd);
+	            processCd.waitFor();  // 현재 위치 변경 완료까지 대기
+	            
+	            // 실행할 명령어 생성
+	            String[] commandPy = {"python", "main.py", "읽어들일 파일 경로", "저장할 파일 경로"};
+
+	            // 명령어 실행
+	            Process processPy = Runtime.getRuntime().exec(commandPy);
+
+	            // 출력 읽기
+	            BufferedReader reader = new BufferedReader(new InputStreamReader(processPy.getInputStream()));
+	            String line;
+	            while ((line = reader.readLine()) != null) {
+	                System.out.println(line);
+	            }
+	        } catch (IOException | InterruptedException e) {
+	            e.printStackTrace();
+	        }
+	}
+	
+	
+	
 	// deeplearning에 파일경로를 넘겨주는 함수
 	public String load_model_from_file(String path) {
 		String outputStr = null;
@@ -268,23 +310,23 @@ S
 	}
 
 	// 악성코드 결과를 저장하는 함수
-	public void save_malware_result(String packing_result, String unpacking_result, String malware, List malware_list){
-		// 악성코드 종류를 저장한 리스트
-		List<PEFile> peList = 
-		// 패킹 탐지결과가 미탐 or 언 패킹이 실패했을 때 악성코드 탐지 결과는 불 필요하다
-		if(packing_result.equals("???") || unpacking_result.equals("Fail")){
-			malware_list.add("???");
-			return;
-		}
-
-		// 악성코드 결과확인
-		if(mw.contains(malware)){
-			malware_list.add(malware);
-		}
-		else{
-			malware_list.add("X");
-		}
-	}
+//	public void save_malware_result(String packing_result, String unpacking_result, String malware, List malware_list){
+//		// 악성코드 종류를 저장한 리스트
+//		List<PEFile> peList
+//		// 패킹 탐지결과가 미탐 or 언 패킹이 실패했을 때 악성코드 탐지 결과는 불 필요하다
+//		if(packing_result.equals("???") || unpacking_result.equals("Fail")){
+//			malware_list.add("???");
+//			return;
+//		}
+//
+//		// 악성코드 결과확인
+//		if(mw.contains(malware)){
+//			malware_list.add(malware);
+//		}
+//		else{
+//			malware_list.add("X");
+//		}
+//	}
 
 	// 분석결과를 저장하는 함수
 	public void save_analysis_result(String packing_result, String unpacking_result, String malware_result,
@@ -341,142 +383,5 @@ S
 		}
 	}
 
-	// 파일 바이너리화
-	public file_info byteArrayToBinary(List<File> PEfile_list) throws IOException {
-//		fileAnalyze = new fileAnalyze();
-//		file_info = new file_info();
-//		file_info.setFlist(PEfile_list);
-//
-		// 삭제할 파일들 저장하는 리스트
-		List<String> delete_list = new ArrayList<String>();
-		// 파일 이름을 저장하는 리스트
-		List<String> name_list = new ArrayList<String>();
-		// 파일 패킹 결과를 저장하는 리스트
-		List<String> packing_list = new ArrayList<String>();
-		// 언패킹 결과를 저장하는 리스트
-		List<String> unpacking_list = new ArrayList<String>();
-		// 악성코드 결과를 저장하는 리스트
-		List<String> malware_list = new ArrayList<String>();
-		// 설명을 저장하는 리스트
-		List<String> describe_list = new ArrayList<String>();
-
-		for (File F : PEfile_list) {
-			String filelocation = F.toString();
-
-			// 삭제할 파일 추가
-			delete_list.add(filelocation);
-
-			// 이름 저장
-			String filelocation_split[] = filelocation.split("\\\\");
-			String file_name = filelocation_split[filelocation_split.length - 1];
-			name_list.add(file_name);
-
-			// 파일 바이너리화 & 16진수 데이터형 변환
-			String binaryfile = binaryEnc(fileToByteArray(filelocation));
-			String hxdresult = BinaryToHxd(binaryfile);
-
-			// 이중배열로 파일 16진수 데이터로 저장
-			String hxdarray[][] = HxdresultToArray(hxdresult);
-
-			// 파일을 분석하여 패킹 결과와 언패킹 결과를 알아내는 함수
-			detectPackAndUnpack(filelocation, hxdarray, packing_list, unpacking_list);
-
-			// 악성코드 탐지하기 위해 deeplearning에 파일경로를 넘겨주는 함수
-			String malware = load_model_from_file(filelocation);
-			// 악성코드 결과 저장
-			save_malware_result(packing_list.get(i), unpacking_list.get(i), malware, malware_list);
-
-			// 분석 결과에 대한 내용을 저장
-			save_analysis_result(packing_list.get(i), unpacking_list.get(i), malware_list.get(i), describe_list);
-
-		}
-
-		file_info.setDeletelist(delete_list);
-		file_info.setFilenamelist(name_list);
-		file_info.setPacking_result(packing_list);
-		file_info.setUnpacking_result(unpacking_list);
-		file_info.setMalware_result(malware_list);
-		file_info.setDescribelist(describe_list);
-
-		// 업로드 파일 삭제
-		deleteFileUpload(delete_list);
-
-		return file_info;
-	}
-
-	public void byteArrayToImage(file_info file_info) {
-
-		int[][] imageArray = new int[128][128];
-		String binaryArray = file_info.getBinary_array();
-
-		int j, k = 0;
-		int tmp = -1;
-		System.out.println(binaryArray.length());
-
-		for (int i = 0; 14 <= binaryArray.length() - i; i += 14) {
-			System.out.println("i = " + i);
-			j = Byte.parseByte(binaryArray.substring(i, i + 7), 2);
-			k = Byte.parseByte(binaryArray.substring(i + 7, i + 14), 2);
-
-			System.out.println(j + ", " + k);
-			if (imageArray[j][k] < 255) {
-				imageArray[j][k] += 1;
-			}
-			tmp = i;
-		}
-		System.out.println(binaryArray.length() - tmp);
-
-		file_info.setImageArray(imageArray);
-	}
-
-	// 파일 바이트 배열로 변환
-	public byte[] fileToByteArray(String location) {
-
-		FileInputStream fis = null;
-		byte[] fileArray = null;
-		System.out.println(location);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		try {
-			fis = new FileInputStream(location);
-			System.out.println(fis);
-
-		} catch (FileNotFoundException e) {
-			System.out.println("Exception position : FileUtil - fileToString(File file)");
-		}
-
-		int len = 0;
-		byte[] buf = new byte[1024];
-
-		try {
-			while ((len = fis.read(buf)) != -1) {
-				baos.write(buf, 0, len);
-			}
-
-			fileArray = baos.toByteArray();
-			fis.close();
-			baos.close();
-		} catch (IOException e) {
-			System.out.println("Exception position : FileUtil - fileToString(File file)");
-		}
-
-		return fileArray;
-	}
-
-	public void pythonExec() {
-
-		PythonInterpreter interpreter = new PythonInterpreter();
-
-		interpreter.execfile("D:\\test.py");
-		interpreter.exec("print(testFunc(5,10))");
-
-		PyFunction pyFunction = interpreter.get("testFunc", PyFunction.class);
-
-		int a = 10;
-		int b = 20;
-
-		PyObject pyObject = pyFunction.__call__(new PyInteger(a), new PyInteger(b));
-		System.out.println(pyObject.toString());
-	}
 
 }

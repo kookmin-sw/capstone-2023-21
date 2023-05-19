@@ -183,27 +183,30 @@ public class fileAnalyze
 //    }
 
 
-    // 언 패킹하기(UPX)
-    public void unPacking(String currentDir, String upload_filePath){
-        String packedFilePath = upload_filePath;
-        // 현재 위치 경로
+    public void unPacking(List<String> file_Name_List, String currentDir, String upload_filePath) {
         String upxPath = currentDir + File.separator + "Capstone\\upx-3.95-win64\\upx.exe";
-        ProcessBuilder pb = new ProcessBuilder(upxPath, "-d" ,packedFilePath);
+        ProcessBuilder pb;
 
-        try{
-            Process process = pb.start();
-            int exitValue = process.waitFor();
-            if(exitValue == 0){
-//                unpacking_list.add("Sccuess");
-            }
-            else{
-//                unpacking_list.add("Fail");
+        try {
+            for (String fileName : file_Name_List) {
+                String packedFilePath = upload_filePath + File.separator + fileName;
+
+                pb = new ProcessBuilder(upxPath, "-d", packedFilePath);
+
+                Process process = pb.start();
+                int exitValue = process.waitFor();
+//
+//                if (exitValue == 0) {
+//                    unpackedFiles.add(fileName);
+//                }
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        } catch(IOException e){
-            throw  new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
+//        return unpackedFiles;
     }
 
 }
