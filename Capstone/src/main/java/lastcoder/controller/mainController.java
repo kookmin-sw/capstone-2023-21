@@ -51,8 +51,8 @@ public class mainController {
 		List<String> hxd_list = urlService.BinaryToHxd(binaryStr_List);
 		
 		List<String[][]> hxd_Array = urlService.HxdresultToArray(hxd_list);
-		
-		urlService.detectPackAndUnpack(hxd_Array);
+		//file_info_List 객체 List 완성
+		urlService.detectPackAndUnpack(urlService.get_file_info_List());
 		
 		return modelAndView;
 	}
