@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.python.core.PyFunction;
@@ -41,6 +42,9 @@ public class urlService {
 	// 업로드할 파일 경로
 	private final String upload_filePath = currentDir + File.separator + "Capstone\\quarantine";
 
+    private final List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
+
+	
 	// PE파일 분류 함수
 	public List<File> checked_PEfile(List<MultipartFile> multiFile) throws IOException {
 
@@ -140,16 +144,6 @@ public class urlService {
 		return hxdArray;
 	}
 
-	public ModelAndView analyzeFile(List<File> PEfile_list) throws IOException {
-		// PE파일들 분석
-		List<byte[]> dataList = convertPEFileToBytes(PEfile_list);
-		// 클라이언트에게 보여줄 뷰(view) 생성
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("receive_URL");
-
-		return mv;
-	}
-
 	// 파일을 분석하여 패킹 결과와 언패킹 결과를 알아내는 함수
 	public void detectPackAndUnpack(List<String[][]> hxdarray) throws IOException {
 		// Image_dos_header
@@ -218,13 +212,15 @@ public class urlService {
 			double entropy = EntryPointEntropy(section_table_offset, section_table_size);
 
 			// 패킹 파일 탐지
-			fileAnalyze.detectPackedFile(filelocation, characteristics, entropy, packing_list, unpacking_list);
+			if (write_characteristics.contains(characteristics) && entropy > 6.85 && entropy < 8) {
+				fileAnalyze.unPacking(currentDir, upload_filePath);
+			}
 		}
 	}
 
 	// 진입점 섹션의 엔트로피 계산 함수
 	public double EntryPointEntropy(int offset, int size) throws IOException {
-		
+
 		byte[] entryPointData = new byte[size];
 
 		// Step 2: 분리한 각 바이트 값의 등장 빈도를 계산합니다.
@@ -246,6 +242,7 @@ public class urlService {
 		return entropy;
 	}
 
+S
 	// deeplearning에 파일경로를 넘겨주는 함수
 	public String load_model_from_file(String path) {
 		String outputStr = null;

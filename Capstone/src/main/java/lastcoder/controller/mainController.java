@@ -50,7 +50,9 @@ public class mainController {
 		List<String> binaryStr_List = urlService.binaryEnc(Byte_list);
 		List<String> hxd_list = urlService.BinaryToHxd(binaryStr_List);
 		
+		List<String[][]> hxd_Array = urlService.HxdresultToArray(hxd_list);
 		
+		urlService.detectPackAndUnpack(hxd_Array);
 		
 		return modelAndView;
 	}

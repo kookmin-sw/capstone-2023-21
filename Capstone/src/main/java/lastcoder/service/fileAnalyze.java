@@ -10,6 +10,9 @@ import java.util.List;
 @Service
 public class fileAnalyze
 {
+    // write 속성을 가진 리스트
+    private final List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
+
 
     // 16진수 값 10진수로 변환 함수
     public int HexToDecimal(int index_location, int byte_size, String hxdarray[][]){
@@ -146,44 +149,44 @@ public class fileAnalyze
     }
 
 
-    // 패킹 파일 탐지 및 언 패킹
-    public void detectPackedFile(String filelocation, String characteristics, double entropy, List packing_list, List unpacking_list){
-        // write 속성을 가진 리스트
-        List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
+//    // 패킹 파일 탐지 및 언 패킹
+//    public void detectPackedFile(String currentDir, String upload_filePath){
+//
+//        unPacking(currentDir, upload_filePath);
 
-        // packing file quarantine(write and entropy)
-        if(write_characteristics.contains(characteristics)){
-
-            if(entropy > 6.85 && entropy < 8){
-                System.out.println("패킹 파일 입니다.");
-                packing_list.add("O");
-                // 언 패킹하기(UPX)
-                unPacking(filelocation, unpacking_list);
-            }
-            else if(entropy > 5.05 && entropy < 6.69){
-                packing_list.add("X");
-                unpacking_list.add("-");
-                System.out.println("패킹 파일이 아닙니다.");
-            }
-            else{
-                packing_list.add("???");
-                unpacking_list.add("-");
-                System.out.println("패킹 파일인지 탐지하지 못했습니다.");
-            }
-        }
-        else{
-            packing_list.add("X");
-            unpacking_list.add("-");
-            System.out.println("패킹 파일이 아닙니다.");
-        }
-    }
+    	
+    	
+//        // packing file quarantine(write and entropy)
+//        if(write_characteristics.contains(characteristics)){
+//            if(entropy > 6.85 && entropy < 8){
+//                System.out.println("패킹 파일 입니다.");
+////                packing_list.add("O");
+//                // 언 패킹하기(UPX)
+//                unPacking(currentDir, upload_filePath);
+//            }
+//            else if(entropy > 5.05 && entropy < 6.69){
+////                packing_list.add("X");
+////                unpacking_list.add("-");
+//                System.out.println("패킹 파일이 아닙니다.");
+//            }
+//            else{
+////                packing_list.add("???");
+////                unpacking_list.add("-");
+//                System.out.println("패킹 파일인지 탐지하지 못했습니다.");
+//            }
+//        }
+//        else{
+////            packing_list.add("X");
+////            unpacking_list.add("-");
+//            System.out.println("패킹 파일이 아닙니다.");
+//        }
+//    }
 
 
     // 언 패킹하기(UPX)
-    public void unPacking(String filelocation, List unpacking_list){
-        String packedFilePath = filelocation;
+    public void unPacking(String currentDir, String upload_filePath){
+        String packedFilePath = upload_filePath;
         // 현재 위치 경로
-        String currentDir = System.getProperty("user.dir");
         String upxPath = currentDir + File.separator + "Capstone\\upx-3.95-win64\\upx.exe";
         ProcessBuilder pb = new ProcessBuilder(upxPath, "-d" ,packedFilePath);
 
@@ -191,10 +194,10 @@ public class fileAnalyze
             Process process = pb.start();
             int exitValue = process.waitFor();
             if(exitValue == 0){
-                unpacking_list.add("Sccuess");
+//                unpacking_list.add("Sccuess");
             }
             else{
-                unpacking_list.add("Fail");
+//                unpacking_list.add("Fail");
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
