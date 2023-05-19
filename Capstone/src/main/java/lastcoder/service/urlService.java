@@ -229,11 +229,15 @@ public class urlService {
 			double entropy = EntryPointEntropy(section_table_offset, section_table_size);
 
 			// 패킹 파일 탐지
-			if (write_characteristics.contains(characteristics) && entropy > 6.85 && entropy < 8) {
+			// write 속성 있고, entropy > 6.85 -> 패킹 파일이다 : 패킹후 저장
+			// write 속성 있고, entorpy < 5.05 -> 패킹 파일이 아니다 : 곧바로 저장
+			
+			if (write_characteristics.contains(characteristics) && entropy > 6.85) {
+				//패킹후 저장
 				file_Name_List = file_Name.get_List();
 				fileAnalyze.unPacking(file_Name_List, currentDir, upload_filePath);
 			} else if (write_characteristics.contains(characteristics) && entropy <= 5.05) {
-
+				//곧바로 저장
 			}
 
 		}
