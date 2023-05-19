@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import lastcoder.model.PEFile;
-import lastcoder.model.file_Name;
 import lastcoder.model.file_info;
 
 @Service
@@ -238,6 +237,7 @@ public class urlService {
 			} else if (write_characteristics.contains(characteristics) && entropy >= 5.05) {
 				//패킹후 저장
 				fileAnalyze.unPacking(info.getFile_Name(), currentDir, upload_filePath);
+				info.saveFile(unpacking_filePath);
 			}
 
 		}
@@ -280,7 +280,7 @@ public class urlService {
 			processCd.waitFor(); // 현재 위치 변경 완료까지 대기
 
 			// 실행할 명령어 생성
-			String[] commandPy = { "python", "main.py", "읽어들일 파일 경로", "저장할 파일 경로" };
+			String[] commandPy = { "python", "main.py", unpacking_filePath, "저장할 파일 경로" };
 
 			// 명령어 실행
 			Process processPy = Runtime.getRuntime().exec(commandPy);

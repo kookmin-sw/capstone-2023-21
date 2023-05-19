@@ -182,7 +182,6 @@ public class fileAnalyze {
 			int exitValue = process.waitFor();
 
 			if (exitValue == 0) {
-				unpackedFiles.add(file_Name);
 			}
 
 		} catch (InterruptedException e) {
