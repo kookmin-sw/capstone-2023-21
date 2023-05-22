@@ -3,7 +3,7 @@ package lastcoder.model;
 import java.util.Arrays;
 import java.util.List;
 
-public enum PEFile{
+public enum PEFile {
     EXE("exe"),
     SRC("src"),
     DLL("dll"),
@@ -23,11 +23,11 @@ public enum PEFile{
     public String getExtension() {
         return extension;
     }
-    
-    public List<PEFile> getPEList(){
-    	PEFile[] peList = PEFile.values();
-    	List<PEFile> peFileList = Arrays.asList(peList);
 
-    	return peFileList;
+    public static List<PEFile> getPEList() {
+        PEFile[] peList = PEFile.values();
+        List<PEFile> peFileList = Arrays.asList(peList);
+
+        return peFileList;
     }
 }

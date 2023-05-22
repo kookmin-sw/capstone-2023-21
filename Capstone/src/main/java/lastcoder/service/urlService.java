@@ -1,10 +1,8 @@
 package lastcoder.service;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -27,15 +25,12 @@ public class urlService {
 	@Autowired
 	private fileAnalyze fileAnalyze;
 
-	@Autowired
-	private PEFile PEFile;
-
 	// 현재 위치 경로
 	private final static String currentDir = System.getProperty("user.dir");
 	// 업로드할 파일 경로
-	private final static String upload_filePath = currentDir + File.separator + "Capstone\\upload_file_path";
-	private final static String unpacking_filePath = currentDir + File.separator + "Capstone\\unpacking_file_Path";
-	private final static String save_file_path = currentDir + File.separator + "Capstone\\save_file_path";
+	private final static String upload_filePath = currentDir + File.separator + "\\upload_file_path";
+	private final static String unpacking_filePath = currentDir + File.separator + "\\unpacking_file_Path";
+	private final static String save_file_path = currentDir + File.separator + "\\save_file_path";
 
 	private final static List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
 
