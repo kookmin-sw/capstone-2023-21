@@ -53,7 +53,7 @@ public class mainController {
 		urlService.HxdresultToArray(hxd_list);
 		//file_info_List 객체 List 완성
 		urlService.detectPackAndUnpack(urlService.get_file_info_List());
-		urlService.run_inference();
+//		urlService.run_inference();
 		
 //		return modelAndView;
 	}

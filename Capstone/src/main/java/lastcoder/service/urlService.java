@@ -39,12 +39,13 @@ public class urlService {
 
 	private final static List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
 
-	private static List<file_info> file_info_List;
+	private List<file_info> file_info_List;
 	
 	public List<file_info> get_file_info_List(){
 		return file_info_List;
 	}
 
+	
 	// PE파일 분류 함수
 	public List<File> checked_PEfile(List<MultipartFile> multiFile) throws IOException {
 		file_info_List = new ArrayList<>();
@@ -285,40 +286,11 @@ public class urlService {
 			// 명령어 실행
 			Process processPy = Runtime.getRuntime().exec(commandPy);
 
-			// 출력 읽기
-			BufferedReader reader = new BufferedReader(new InputStreamReader(processPy.getInputStream()));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
-			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
-	// deeplearning에 파일경로를 넘겨주는 함수
-	public String load_model_from_file(String path) {
-		String outputStr = null;
-
-		try {
-			System.out.println("path : " + path);
-
-			ProcessBuilder processBuilder = new ProcessBuilder("python",
-					"C:\\Users\\82109\\Desktop\\real\\capstone-2023-21\\Capstone\\src\\main\\java\\lastcoder\\service\\file.py",
-					path);
-			processBuilder.redirectErrorStream(true);
-			Process process = processBuilder.start();
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			outputStr = reader.readLine();
-			reader.close();
-
-			process.waitFor();
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-		return outputStr;
-	}
 
 	// 악성코드 결과를 저장하는 함수
 //	public void save_malware_result(String packing_result, String unpacking_result, String malware, List malware_list){
