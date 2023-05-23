@@ -1,6 +1,3 @@
-import tensorflow as tf
-from tensorflow.keras import layers
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import pandas as pd
 import os
@@ -9,55 +6,7 @@ from tqdm import tqdm
 import pickle
 import csv
 import math
-
-from tensorflow.python.client import device_lib
-
-
-def use_gpu():
-    print("Device_lib : " + str(device_lib.list_local_devices()))
-    # '0번' GPU 사용
-    print("Use able device : " + str(tf.config.experimental.list_physical_devices()))
-
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2, 3"
-    gpus = tf.config.experimental.list_physical_devices('GPU')
-    print(gpus)
-    tf.config.experimental.set_visible_devices(gpus, 'GPU')
-
-    # os.environ["CUDA_VISIBLE_DEVICES"]="0"
-    # gpus = tf.config.experimental.list_physical_devices('GPU')
-    # tf.config.experimental.set_visible_devices([],'GPU')
-
-    if len(gpus) > 0:
-        tf.config.experimental.set_memory_growth(gpus[0], True)
-        print('GPU 메모리 할당 제한이 해제되었습니다.')
-    else:
-        print('GPU를 사용할 수 없습니다.')
-
-    if len(gpus) > 0:
-        tf.config.set_logical_device_configuration(
-            gpus[0], [tf.config.LogicalDeviceConfiguration(memory_limit=1)])
-        print('GPU 메모리 할당 비율이 조정되었습니다.')
-    else:
-        print('GPU를 사용할 수 없습니다.')
-
-    logical_devices = tf.config.list_logical_devices('GPU')
-    physical_devices = tf.config.list_physical_devices('GPU')
-
-    if len(physical_devices) > 0:
-        print('사용 가능한 GPU가 있습니다')
-    else:
-        print('사용 가능한 GPU가 없습니다')
-
-    if len(logical_devices) > 0:
-        print(logical_devices)
-        print('GPU 사용 중입니다.')
-    else:
-        print('GPU를 사용하고 있지 않습니다.')
-    print(tf.config.list_logical_devices())
-    print(tf.config.experimental.list_physical_devices())
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-    # os.environ["CUDA_VISIBLE_DEVICES"] = "-1" => cpu 사용 강제
-    tf.debugging.set_log_device_placement(True)
+import process
 
 
 def generate_predict_data(images_dict, batch_size):
@@ -75,6 +24,8 @@ def generate_predict_data(images_dict, batch_size):
 
 
 def make_generator(output_file_path):
+    process.remove_existing_txt_files(output_file_path)
+
     file_names = [f for f in os.listdir(
         output_file_path) if f.endswith('.npy')]
     file_name_to_image = {file_name: np.load(os.path.join(
@@ -100,11 +51,9 @@ def save_csv(predictions):
             csv_writer.writerow([file_name] + one_hot)
 
 
-def predict_files(output_file_path, model):
+def predict_files(output_file_path, file_to_npy, model):
 
-    use_gpu()
-
-    predict_data_generator, num_predictions = make_generator(output_file_path)
+    predict_data_generator, num_predictions = make_generator(file_to_npy)
     predictions = {}  # 딕셔너리로 변경
 
     num_batches = math.ceil(num_predictions)

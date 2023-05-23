@@ -1,13 +1,17 @@
 package lastcoder.service;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,22 +29,32 @@ public class urlService {
 	@Autowired
 	private fileAnalyze fileAnalyze;
 
+	@Autowired
+	private fileToHex fileToHex;
+	
+	@Autowired
+	private peFile_Body_Extractor peFile_Body_Extractor;
+	
 	// 현재 위치 경로
 	private final static String currentDir = System.getProperty("user.dir");
 	// 업로드할 파일 경로
-	private final static String upload_filePath = currentDir + File.separator + "\\upload_file_path";
-	private final static String unpacking_filePath = currentDir + File.separator + "\\unpacking_file_Path";
-	private final static String save_file_path = currentDir + File.separator + "\\save_file_path";
+	private final static String upload_filePath = currentDir + File.separator + "upload_file_path";
+	private final static String unpacking_filePath = currentDir + File.separator + "unpacking_file_Path";
+	private final static String file_to_npy = currentDir + File.separator + "file_to_npy";
+	private final static String save_file_path = currentDir + File.separator + "save_file_path";
+	private final static String file_to_hex = currentDir + File.separator + "file_to_hex";
+	
+	private final String[] file_list = {upload_filePath, unpacking_filePath, file_to_npy, file_to_hex, save_file_path};
 
 	private final static List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
 
 	private List<file_info> file_info_List;
-	
-	public List<file_info> get_file_info_List(){
+
+	public List<file_info> get_file_info_List() {
 		return file_info_List;
 	}
-
 	
+
 	// PE파일 분류 함수
 	public List<File> checked_PEfile(List<MultipartFile> multiFile) throws IOException {
 		file_info_List = new ArrayList<>();
@@ -143,13 +157,13 @@ public class urlService {
 
 			hxdArray.add(hxdarray);
 		}
-		
+
 		int size = hxdArray.size();
 		for (int i = 0; i < size; i++) {
-		    String[][] hxdData = hxdArray.get(i);
-		    file_info fileInfo = file_info_List.get(i);
-		    
-		    fileInfo.setFile_Array(hxdData);
+			String[][] hxdData = hxdArray.get(i);
+			file_info fileInfo = file_info_List.get(i);
+
+			fileInfo.setFile_Array(hxdData);
 		}
 	}
 
@@ -160,7 +174,7 @@ public class urlService {
 
 		for (file_info info : file_info_List) {
 			String[][] str = info.getFile_Array();
-			
+
 			fileAnalyze.isPEFile(str);
 
 			// e_lfanew로 IMAGE_NT_HEADERS 위치 찾기
@@ -226,12 +240,13 @@ public class urlService {
 			// 패킹 파일 탐지
 			// write 속성 있고, entropy > 6.85 -> 패킹 파일이다 : 패킹후 저장
 			// write 속성 있고, entorpy < 5.05 -> 패킹 파일이 아니다 : 곧바로 저장
-			
+			fileAnalyze.unPacking(info.getFile_Name(), currentDir, upload_filePath);
+			info.saveFile(unpacking_filePath);
 			if (write_characteristics.contains(characteristics) && entropy < 5.05) {
-				//곧바로 저장
+				// 곧바로 저장
 				info.saveFile(unpacking_filePath);
 			} else if (write_characteristics.contains(characteristics) && entropy >= 5.05) {
-				//패킹후 저장
+				// 패킹후 저장
 				fileAnalyze.unPacking(info.getFile_Name(), currentDir, upload_filePath);
 				info.saveFile(unpacking_filePath);
 			}
@@ -263,29 +278,109 @@ public class urlService {
 		return entropy;
 	}
 
-	public void run_inference() {
-		try {
-			// 아나콘다 가상머신 실행 및 현재 위치 변경
-			String[] commandVm = { "conda", "activate", "python_VM" }; // 아나콘다 가상머신 실행 명령어
-			Process processVm = Runtime.getRuntime().exec(commandVm);
-			processVm.waitFor(); // 가상머신 실행 완료까지 대기
-
-			// 현재 위치 변경
-			String[] commandCd = { "cd", "D:\\Git\\capstone-2023-21\\Capstone" }; // 현재 위치 변경 명령어
-			Process processCd = Runtime.getRuntime().exec(commandCd);
-			processCd.waitFor(); // 현재 위치 변경 완료까지 대기
-
-			// 실행할 명령어 생성
-			String[] commandPy = { "python", "main.py", unpacking_filePath, save_file_path };
-
-			// 명령어 실행
-			Process processPy = Runtime.getRuntime().exec(commandPy);
-
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
+	
+	public void fileToHex_Method() {
+		fileToHex.fileToHexArray(unpacking_filePath, file_to_hex);
 	}
+	
+	public void peFile_Body_Extractor_Method() {
+		peFile_Body_Extractor.extract_body(file_to_hex, save_file_path);
+	}
+	
+    public void deleteFilesInFolders(String[] folders) {
+        for (String folderPath : folders) {
+            File folder = new File(folderPath);
+            if (folder.exists() && folder.isDirectory()) {
+                File[] files = folder.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        if (file.isFile()) {
+                            file.delete();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    public Map<String, Integer> readPredictionsFromCSV(String filePath) {
+        Map<String, Integer> predictions = new HashMap<>();
 
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line = reader.readLine(); // 헤더 라인 읽기
+            String[] headers = line.split(",");
+            int classCount = headers.length - 1;
+
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",");
+                String id = values[0];
+                int predictedClass = -1;
+
+                for (int i = 1; i < values.length; i++) {
+                    int prediction = Integer.parseInt(values[i]);
+                    if (prediction == 1) {
+                        predictedClass = i;
+                        break;
+                    }
+                }
+
+                if (predictedClass != -1) {
+                    predictions.put(id, predictedClass);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return predictions;
+    }
+	
+    
+    
+	public Map<String, Integer> run_inference() {
+	    try {
+	        // 아나콘다 가상환경 실행
+	        ProcessBuilder condaProcessBuilder = new ProcessBuilder("cmd.exe", "/c", "conda", "activate", "python_VM", "&&", "cd", currentDir, "&&", "python", "main.py", file_to_hex, file_to_npy, save_file_path);
+	        Process condaProcess = condaProcessBuilder.start();
+	        condaProcess.waitFor();
+	        System.out.println("conda activate");
+	        
+	        // main.py의 출력 파일 경로
+	        String outputFilePath = ".\\output.txt";
+
+	        // 출력 파일을 읽어서 출력 확인
+	        try (BufferedReader reader = new BufferedReader(new FileReader(outputFilePath))) {
+	            String line;
+	            while ((line = reader.readLine()) != null) {
+	                System.out.println(line);
+	            }
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	        
+	        deleteFilesInFolders(file_list);
+	        
+	    } catch (IOException | InterruptedException e) {
+	        e.printStackTrace();
+	    }
+	    
+        String filePath = currentDir + File.separator + "predictions.csv"; // predictions.csv 파일 경로 설정
+
+        Map<String, Integer> predictions = readPredictionsFromCSV(filePath);
+        
+        return predictions;
+ 
+
+	}
+	
+	public void inference_result(Map<String, Integer> predictions) {
+        for (Map.Entry<String, Integer> entry : predictions.entrySet()) {
+            String id = entry.getKey();
+            int predictedClass = entry.getValue();
+
+            // 예측 결과 활용하여 원하는 작업 수행
+            // ...
+        }
+	}
 
 	// 악성코드 결과를 저장하는 함수
 //	public void save_malware_result(String packing_result, String unpacking_result, String malware, List malware_list){

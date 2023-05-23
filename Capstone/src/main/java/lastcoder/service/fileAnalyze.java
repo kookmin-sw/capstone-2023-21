@@ -171,19 +171,23 @@ public class fileAnalyze {
 //    }
 
 	public void unPacking(String file_Name, String currentDir, String upload_filePath) {
-		String upxPath = currentDir + File.separator + "Capstone\\upx-3.95-win64\\upx.exe";
+		String upxPath = currentDir + File.separator + "upx-3.95-win64\\upx.exe";
 		ProcessBuilder pb;
 		try {
 			String packedFilePath = upload_filePath + File.separator + file_Name;
-
+//			System.out.println(upxPath);
+			
 			pb = new ProcessBuilder(upxPath, "-d", packedFilePath);
 
 			Process process = pb.start();
 			int exitValue = process.waitFor();
 
 			if (exitValue == 0) {
+				System.out.println("unpacking suscceful");
+			}else {
+				System.out.println("unpacking fail");
 			}
-
+			
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {

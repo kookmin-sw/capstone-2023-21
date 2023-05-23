@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import glob
 
 
 def process_files(input_file_path, output_file_path):
@@ -28,23 +29,34 @@ def process_files(input_file_path, output_file_path):
             f.write('\n'.join(hex_data))
 
 
+def remove_existing_txt_files(output_file_path):
+    # 기존 확장자와 새로운 확장자 지정
+    new_ext = '.txt'
+
+    # .txt 파일 제거
+    for file_path in glob.glob(output_file_path + '/*' + new_ext):
+        os.remove(file_path)
+
+
 def change_extension(output_file_path):
     # 기존 확장자와 새로운 확장자 지정
     old_ext = '.bytes'
     new_ext = '.txt'
+
+    # .txt 파일 제거
+    remove_existing_txt_files(output_file_path)
 
     # 각 폴더를 돌며 기존 확장자로 끝나는 파일들의 이름을 변경
     for file_path in glob.glob(output_file_path + '/*' + old_ext):
         os.rename(file_path, os.path.splitext(file_path)[0] + new_ext)
 
 
-def change_to_array(output_file_path):
+def change_to_array(output_file_path, file_to_npy):
     file_list = []
     for root, dirs, files in os.walk(output_file_path):
         for file in files:
             file_list.append(os.path.join(root, file))  # 파일 경로 출력
 
-    npy_list = []
     for file_path in file_list:
         hex_data = []
         len_check = False
@@ -74,6 +86,8 @@ def change_to_array(output_file_path):
             if len_check:
                 break
 
-        npy_list.append(img_data)
-
-    return npy_list
+        # .npy 형식으로 저장
+        output_file_name = os.path.splitext(
+            os.path.basename(file_path))[0] + '.npy'
+        output_file_path = os.path.join(file_to_npy, output_file_name)
+        np.save(output_file_path, img_data)

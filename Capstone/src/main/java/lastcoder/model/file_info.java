@@ -18,9 +18,10 @@ public class file_info {
 	
     public void saveFile(String filePath) {
         if (file != null) {
-            File destination = new File(filePath);
             try {
                 // 파일을 복사하여 저장
+    			String fileName = file.getName();
+    			File destination = new File(filePath + File.separator + fileName);
                 org.apache.commons.io.FileUtils.copyFile(file, destination);
                 System.out.println("File saved successfully: " + filePath);
             } catch (IOException e) {

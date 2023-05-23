@@ -10,9 +10,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import lastcoder.model.PEFile;
 import lastcoder.model.file_info;
+import lastcoder.service.fileToHex;
 import lastcoder.service.urlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,7 +42,7 @@ public class mainController {
 
 	@PostMapping("/receive_URL")
 	@ResponseBody
-	public void receiveURL(MultipartHttpServletRequest multipartFile) throws IOException {
+	public ModelAndView receiveURL(MultipartHttpServletRequest multipartFile) throws IOException {
 		// 입력받은 파일들을 저장한 리스트
 		List<MultipartFile> multiFile = multipartFile.getFiles("multipartFile");
 
@@ -53,8 +55,14 @@ public class mainController {
 		urlService.HxdresultToArray(hxd_list);
 		//file_info_List 객체 List 완성
 		urlService.detectPackAndUnpack(urlService.get_file_info_List());
-//		urlService.run_inference();
+		urlService.fileToHex_Method();
 		
-//		return modelAndView;
+		Map<String, Integer> predictions = urlService.run_inference();
+		urlService.inference_result(predictions);
+		
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("predictions", predictions);
+		
+		return mv;
 	}
 }
