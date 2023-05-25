@@ -1,16 +1,6 @@
-# 프로젝트 명 : Malware Checker
+# Malware Checker  
 
 github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-sw.github.io/capstone-2023-21/)
-
-## 목차
-
-1. [프로젝트 소개](##-1.-프로젝트-소개)
-2. [소개 영상](##-2.-소개-영상)
-3. [팀 소개](##-3.-팀-소개)
-4. [사용법](##-4.-사용법)
-5. [기타](##-5.-기타)
-
----
 
 ## 1. 프로젝트 소개
 
