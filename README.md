@@ -15,6 +15,7 @@
 
 ## 🔧 주요 기술
 
+<p align="center"><img src="https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/3dab7f3a-cf5b-4200-adbc-e1109c1e06b6"></p> 
 
 
 ---
