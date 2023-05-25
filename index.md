@@ -66,14 +66,6 @@ CNN 딥러닝을 사용하여 악성 파일을 검사하였습니다. 학습 데
 
 ---
 
-## 💻 웹 페이지 구성
-
-|Main Page|Upload Page|Receive Page|
-|:-:|:-:|:-:|
-|<img src="https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/f66b3399-7134-4283-9a7d-d46f089d19fa" width="500" height="500">|<img src="https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/00360df0-9dbe-4c4b-b392-f527ed47fb0c" width="500" height="500">|<img src="https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/06a07347-377f-4d97-a693-3796d9dc25f1" width="500" height="500">|
-
----
-
 
 ## 👍 기대효과
 
