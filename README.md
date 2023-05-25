@@ -2,6 +2,9 @@
 
 악성 파일 여부 및 파일 정보를 알려주는 웹 서비스
 
+![malware_checker_icon](https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/e2ebce95-c45d-4d75-a38d-2c42cf9a38ca)
+
+
 github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-sw.github.io/capstone-2023-21/)
 
 ## 1. 프로젝트 소개
@@ -18,7 +21,18 @@ github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-s
 
 ---
 
-## 3. 팀 소개
+## 3. 웹 페이지 구성
+
+---
+
+## 4. 기대효과
+
+1. 직관적으로 파일 분석 결과 확인 가능
+2. 다른 종류의 악성코드 데이터를 추가 학습하여 성장 가능
+
+---
+
+## 5. 팀 소개
 
 팀 : 21조 (kookmin-sw/capstone-2023-21)
 
@@ -29,16 +43,4 @@ github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-s
 
 ---
 
-## 4. 사용법
 
-1. Repositories에서 프로젝트를 다운 받습니다.
-2. 압축을 해제하고 프로젝트를 Spring을 통해 실행
-3. 웹사이트에 'http://localhost:8090/input_URL' 입력
-4. 파일 업로드를 클릭하여 파일 선택
-5. submit 버튼을 클릭하여 결과 확인 
-
----
-
-## 5. 기타
-
----
