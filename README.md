@@ -15,7 +15,10 @@
 
 ## 🔧 주요 기술
 
-<p align="center"><img src="https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/3dab7f3a-cf5b-4200-adbc-e1109c1e06b6"></p> 
+<p align="center"><img src="https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/3dab7f3a-cf5b-4200-adbc-e1109c1e06b6"></p>
+
+**1. 패킹 파일 탐지**
+**2. 악성코드 탐지 및 분류**
 
 
 ---
