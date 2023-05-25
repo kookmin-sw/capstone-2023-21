@@ -36,7 +36,7 @@ github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-s
 
 ---
 
-## 5. 팀 소개
+## 👫 팀 소개
 
 팀 : 21조 (kookmin-sw/capstone-2023-21)
 
