@@ -1,17 +1,13 @@
-# Malware Checker  
+# Malware Checker : 악성 파일 여부 및 파일 정보를 알려주는 웹 서비스
 
 github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-sw.github.io/capstone-2023-21/)
 
 ## 1. 프로젝트 소개
 
-1. 주제 : 악성 파일을 검사 해주는 웹 페이지 개발
+우리는 현재 디지털 시대를 살고 있으며, 인터넷과 컴퓨터를 사용하는 일상생활이 빈번하게 일어나고 있습니다. 그러나 인터넷 상에서 다운로드 받거나 받은 파일을 실행하다 보면 악성코드에 감염될 가능성이 있습니다.
+이에 대비하여, 사용자들이 소유한 파일이 악성코드인지 아닌지를 쉽게 확인할 수 있도록 도와주는 웹 서비스를 개발하려고 합니다.
 
 2. 주요 기술 : PE 파일 분석, 악성 파일 분석
-
-3. 진행 방향 
- - Spring Framework로 웹 페이지 개발(3 Tier-Architecture)
- - upload한 파일들을 분석하여 패킹 탐지 및 언 패킹 
- - Tensorflow로 Deep Learning을 construct 하여 악성 파일 검사 
 
 ---
 
