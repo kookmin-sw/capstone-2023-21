@@ -23,6 +23,10 @@ github page : [https://kookmin-sw.github.io/capstone-2023-21/](https://kookmin-s
 
 ## 3. 웹 페이지 구성
 
+|Main Page|Upload Page|Receive Page|
+|:-:|:-:|:-:|
+|![image](https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/f66b3399-7134-4283-9a7d-d46f089d19fa)|![image (2)](https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/00360df0-9dbe-4c4b-b392-f527ed47fb0c)|![image (1)](https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/06a07347-377f-4d97-a693-3796d9dc25f1)|
+
 ---
 
 ## 4. 기대효과
