@@ -18,7 +18,40 @@
 <p align="center"><img src="https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/3dab7f3a-cf5b-4200-adbc-e1109c1e06b6"></p>
 
 1. **패킹 파일 탐지**
+
+악성 파일들의 대부분은 탐지 회피 및 효율적인 배포를 위해 파일을 패킹되어 있고 패킹이 되어 있다면 파일의 데이터를 올바른 값으로 읽어 들일 수 없기 때문에 파일의 패킹 유무를 확인해야합니다.
+
+<p align="center"><img src="https://github.com/kookmin-sw/capstone-2023-21/assets/39542937/b16bf5ed-1fee-451f-b41b-48960dd4a4c6"></p>
+
+패킹 탐지 기술은 **진입점 섹션**의 패킹의 필수적인 특징인 **'write'속성**과 **엔트로피 통계**를 이용하여 구현하였습니다.
+
+</br>
+
 2. **악성코드 탐지 및 분류**
+
+CNN 딥러닝을 사용하여 악성 파일을 검사하였습니다. 학습 데이터 셋으로는 Kaggle의 Microsoft Malware Classification Challenge (BIG 2015)의 데이터를 사용하였습니다. 데이터의 내용은 PE파일에서 header를 제외하고, 파일의 바이너리 값을 16진수로 변환하였습니다. 각 악성 파일마다 레이블이 매겨져 있으며 레이블은 총 9개의 악성 파일 클래스로 나뉘어져 있습니다.
+
+
+|       Name       |         Type       |
+| :--------------: | :----------------: |
+|     `Ramnit`     |           Worm        |
+|    `Lollipop`    |          Adware       |
+|  `Kelihos_ver3`  |         Backdoor      |
+|     `Vundo`      |           Trojan       |
+|     `Simda`      |          Backdoor      |
+|     `Tracur`     |     Trojan Downloader  |
+|  `Kelihos_ver1`  |         Backdoor      |
+| `Obfuscator.ACY` |   Obfuscated malware |
+|     `Gatak`      |        Backdoor      |
+
+
+
+**PE 파일 분석에서 CNN을 적용한 이유**
+- 파일은 헤더, 코드 섹션, 데이터 섹션 등과 같이 여러 구성 요소로 이루어진 바이너리 데이터의 파일입니다. 이러한 구성 요소는 하나의 이미지로 볼 수 있습니다.
+- PE 파일을 이미지로 변환하고, CNN 모델을 통해 각각의 이미지를 분류하고 분석할 수 있습니다.
+- CNN을 사용하여 PE 파일을 분석하면, 이미지 처리와 마찬가지로 지역성과 통계적 균일성을 활용하여 PE 파일의 특징을 추출하고 분류하는 데 효과적입니다.
+
+
 
 
 ---
@@ -35,10 +68,6 @@
 
 1. 직관적으로 파일 분석 결과 확인 가능
 2. 다른 종류의 악성코드 데이터를 추가 학습하여 성장 가능
-
----
-
-## 🔍 사용법
 
 ---
 
