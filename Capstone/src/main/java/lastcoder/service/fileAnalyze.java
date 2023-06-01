@@ -2,6 +2,8 @@ package lastcoder.service;
 
 import org.springframework.stereotype.Service;
 
+import lastcoder.model.predict_Result;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,8 +11,6 @@ import java.util.List;
 
 @Service
 public class fileAnalyze {
-	// write 속성을 가진 리스트
-	private final List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
 
 	// 16진수 값 10진수로 변환 함수
 	public int HexToDecimal(int index_location, int byte_size, String hxdarray[][]) {
@@ -170,24 +170,31 @@ public class fileAnalyze {
 //        }
 //    }
 
-	public void unPacking(String file_Name, String currentDir, String upload_filePath) {
+	public void unPacking(String file_Name, String currentDir, String upload_filePath, List<predict_Result> predict_Results) {
 		String upxPath = currentDir + File.separator + "upx-3.95-win64\\upx.exe";
 		ProcessBuilder pb;
 		try {
 			String packedFilePath = upload_filePath + File.separator + file_Name;
 //			System.out.println(upxPath);
 			
-			pb = new ProcessBuilder(upxPath, "-d", packedFilePath);
+			pb = new ProcessBuilder(upxPath, " -d ", packedFilePath);
 
 			Process process = pb.start();
 			int exitValue = process.waitFor();
 
-			if (exitValue == 0) {
-				System.out.println("unpacking suscceful");
-			}else {
-				System.out.println("unpacking fail");
-			}
 			
+			for(predict_Result pr : predict_Results) {
+				if(pr.getFile_Origin_Name().equals(file_Name)){
+					pr.setPacking("O");
+					if (exitValue == 0) {
+						System.out.println("unpacking suscceful");
+						pr.setUnpacking("O");
+					}else {
+						System.out.println("unpacking fail");
+						pr.setUnpacking("X");
+					}
+				}	
+			}			
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {

@@ -12,6 +12,7 @@ import lombok.Data;
 public class file_info {
 
 	private File file;
+	private String file_Origin_Name;
 	private String file_Name;
 	private String[][] file_Array;
 

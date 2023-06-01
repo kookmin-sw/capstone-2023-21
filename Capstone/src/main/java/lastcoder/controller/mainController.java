@@ -14,6 +14,7 @@ import java.util.Map;
 
 import lastcoder.model.PEFile;
 import lastcoder.model.file_info;
+import lastcoder.model.predict_Result;
 import lastcoder.service.fileToHex;
 import lastcoder.service.urlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +57,15 @@ public class mainController {
 		//file_info_List 객체 List 완성
 		urlService.detectPackAndUnpack(urlService.get_file_info_List());
 		urlService.fileToHex_Method();
+//		urlService.peFile_Body_Extractor_Method();
 		
 		Map<String, Integer> predictions = urlService.run_inference();
 		urlService.inference_result(predictions);
 		
+		System.out.println(urlService.get_predict_Results());
+		
 		ModelAndView mv = new ModelAndView();
-		mv.addObject("predictions", predictions);
+		mv.addObject("prediction_List", urlService.get_predict_Results());
 		
 		return mv;
 	}

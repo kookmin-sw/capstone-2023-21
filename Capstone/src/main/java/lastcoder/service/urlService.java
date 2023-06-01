@@ -19,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lastcoder.model.PEFile;
 import lastcoder.model.file_info;
+import lastcoder.model.malware_info;
+import lastcoder.model.predict_Result;
 
 @Service
 public class urlService {
@@ -31,11 +33,14 @@ public class urlService {
 
 	@Autowired
 	private fileToHex fileToHex;
-	
+
 	@Autowired
 	private peFile_Body_Extractor peFile_Body_Extractor;
-	
-	// 현재 위치 경로
+
+	@Autowired
+	private predict_Result predict_Result;
+
+	// 현재 위치 경로 
 	private final static String currentDir = System.getProperty("user.dir");
 	// 업로드할 파일 경로
 	private final static String upload_filePath = currentDir + File.separator + "upload_file_path";
@@ -43,21 +48,30 @@ public class urlService {
 	private final static String file_to_npy = currentDir + File.separator + "file_to_npy";
 	private final static String save_file_path = currentDir + File.separator + "save_file_path";
 	private final static String file_to_hex = currentDir + File.separator + "file_to_hex";
-	
-	private final String[] file_list = {upload_filePath, unpacking_filePath, file_to_npy, file_to_hex, save_file_path};
+	private final static String file_to_hex_body = currentDir + File.separator + "file_to_hex_body";
+
+	private final String[] file_list = { upload_filePath, unpacking_filePath, file_to_npy, file_to_hex, save_file_path,
+			file_to_hex_body };
 
 	private final static List<String> write_characteristics = Arrays.asList("A0", "C0", "E0");
 
 	private List<file_info> file_info_List;
+	private List<predict_Result> predict_Results;
 
 	public List<file_info> get_file_info_List() {
 		return file_info_List;
 	}
-	
+
+	public List<predict_Result> get_predict_Results() {
+		return predict_Results;
+	}
 
 	// PE파일 분류 함수
 	public List<File> checked_PEfile(List<MultipartFile> multiFile) throws IOException {
+
 		file_info_List = new ArrayList<>();
+		predict_Results = new ArrayList<>();
+
 		// PE파일 확장자들을 저장한 리스트
 		List<PEFile> peList = PEFile.getPEList();
 
@@ -66,13 +80,22 @@ public class urlService {
 		File uploadFile;
 
 		for (MultipartFile file : multiFile) {
+
 			file_info = new file_info();
+			predict_Result = new predict_Result();
+
 			String fileName = file.getOriginalFilename();
 			String[] extension = fileName.split("\\.");
 
 			if (peList.stream().anyMatch(ext -> ext.getExtension().equals(extension[extension.length - 1]))) {
 				// 업로드할 경로에 파일 생성
 				uploadFile = new File(upload_filePath + File.separator + fileName);
+				file_info.setFile_Origin_Name(fileName);
+				predict_Result.setFile_Origin_Name(fileName);
+				fileName = fileName.split("\\.")[0];
+//				if(fileName.length() >= 15) {
+//					fileName = fileName.substring(0, 14);
+//				}
 				try {
 					// 입력 받은 파일을 지정한 경로(upload)에 저장
 					file.transferTo(uploadFile);
@@ -80,6 +103,10 @@ public class urlService {
 					file_info.setFile(uploadFile);
 					file_info.setFile_Name(fileName);
 					file_info_List.add(file_info);
+
+					predict_Result.setFile_name(fileName);
+					predict_Results.add(predict_Result);
+
 				} catch (IllegalStateException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -88,7 +115,7 @@ public class urlService {
 			}
 		}
 		return PEfile_list;
-
+ 
 	}
 
 	public List<byte[]> convertPEFileToBytes(List<File> PEfile_list) throws IOException {
@@ -235,19 +262,21 @@ public class urlService {
 			System.out.println("파일 속성 : " + characteristics);
 
 			// 엔트로피
-			double entropy = EntryPointEntropy(section_table_offset, section_table_size);
+			double entropy = EntryPoint(info.getFile(), section_table_offset, section_table_size);
 
 			// 패킹 파일 탐지
 			// write 속성 있고, entropy > 6.85 -> 패킹 파일이다 : 패킹후 저장
 			// write 속성 있고, entorpy < 5.05 -> 패킹 파일이 아니다 : 곧바로 저장
-			fileAnalyze.unPacking(info.getFile_Name(), currentDir, upload_filePath);
-			info.saveFile(unpacking_filePath);
-			if (write_characteristics.contains(characteristics) && entropy < 5.05) {
-				// 곧바로 저장
-				info.saveFile(unpacking_filePath);
-			} else if (write_characteristics.contains(characteristics) && entropy >= 5.05) {
-				// 패킹후 저장
-				fileAnalyze.unPacking(info.getFile_Name(), currentDir, upload_filePath);
+//			fileAnalyze.unPacking(info.getFile_Name(), currentDir, upload_filePath, predict_Results);
+//			info.saveFile(unpacking_filePath);
+			if (write_characteristics.contains(characteristics)) {
+
+				if (entropy >= 5.05) {
+					// 패킹후 저장
+					fileAnalyze.unPacking(info.getFile_Origin_Name(), currentDir, upload_filePath, predict_Results);
+					info.saveFile(unpacking_filePath);
+				}
+			} else {
 				info.saveFile(unpacking_filePath);
 			}
 
@@ -255,204 +284,156 @@ public class urlService {
 	}
 
 	// 진입점 섹션의 엔트로피 계산 함수
-	public double EntryPointEntropy(int offset, int size) throws IOException {
+	public double EntryPoint(File f, int offset, int size) {
+		try {
+			FileInputStream fis = new FileInputStream(f);
+			fis.skip(offset);
+			byte[] entryPointData = new byte[size];
+			fis.read(entryPointData);
+			fis.close();
 
-		byte[] entryPointData = new byte[size];
-
-		// Step 2: 분리한 각 바이트 값의 등장 빈도를 계산합니다.
-		int[] freq = new int[256];
-		for (byte b : entryPointData) {
-			freq[b & 0xFF]++;
-		}
-
-		// Step 3: 등장 빈도를 확률 분포로 바꾸어 정보 이론(Shannon entropy)의 엔트로피 공식에 따라 계산합니다.
-		double entropy = 0;
-		for (int f : freq) {
-			if (f > 0) {
-				double p = (double) f / entryPointData.length;
-				entropy -= p * Math.log(p) / Math.log(2);
+			// Step 2: 분리한 각 바이트 값의 등장 빈도를 계산합니다.
+			int[] freq = new int[256];
+			for (byte b : entryPointData) {
+				freq[b & 0xFF]++;
 			}
+
+			// Step 3: 등장 빈도를 확률 분포로 바꾸어 정보 이론(Shannon entropy)의 엔트로피 공식에 따라 계산합니다.
+			double entropy = 0;
+			for (int count : freq) {
+				if (count > 0) {
+					double p = (double) count / entryPointData.length;
+					entropy -= p * Math.log(p) / Math.log(2);
+				}
+			}
+
+			// 엔트로피 값을 출력합니다.
+			System.out.println("Entry point entropy: " + entropy);
+			return entropy;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return 0;
 		}
-		// 엔트로피 값을 출력합니다.
-		System.out.println("Entry point entropy: " + entropy);
-		return entropy;
 	}
 
-	
 	public void fileToHex_Method() {
 		fileToHex.fileToHexArray(unpacking_filePath, file_to_hex);
 	}
-	
+
 	public void peFile_Body_Extractor_Method() {
-		peFile_Body_Extractor.extract_body(file_to_hex, save_file_path);
-	}
-	
-    public void deleteFilesInFolders(String[] folders) {
-        for (String folderPath : folders) {
-            File folder = new File(folderPath);
-            if (folder.exists() && folder.isDirectory()) {
-                File[] files = folder.listFiles();
-                if (files != null) {
-                    for (File file : files) {
-                        if (file.isFile()) {
-                            file.delete();
-                        }
-                    }
-                }
-            }
-        }
-    }
-    public Map<String, Integer> readPredictionsFromCSV(String filePath) {
-        Map<String, Integer> predictions = new HashMap<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line = reader.readLine(); // 헤더 라인 읽기
-            String[] headers = line.split(",");
-            int classCount = headers.length - 1;
-
-            while ((line = reader.readLine()) != null) {
-                String[] values = line.split(",");
-                String id = values[0];
-                int predictedClass = -1;
-
-                for (int i = 1; i < values.length; i++) {
-                    int prediction = Integer.parseInt(values[i]);
-                    if (prediction == 1) {
-                        predictedClass = i;
-                        break;
-                    }
-                }
-
-                if (predictedClass != -1) {
-                    predictions.put(id, predictedClass);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return predictions;
-    }
-	
-    
-    
-	public Map<String, Integer> run_inference() {
-	    try {
-	        // 아나콘다 가상환경 실행
-	        ProcessBuilder condaProcessBuilder = new ProcessBuilder("cmd.exe", "/c", "conda", "activate", "python_VM", "&&", "cd", currentDir, "&&", "python", "main.py", file_to_hex, file_to_npy, save_file_path);
-	        Process condaProcess = condaProcessBuilder.start();
-	        condaProcess.waitFor();
-	        System.out.println("conda activate");
-	        
-	        // main.py의 출력 파일 경로
-	        String outputFilePath = ".\\output.txt";
-
-	        // 출력 파일을 읽어서 출력 확인
-	        try (BufferedReader reader = new BufferedReader(new FileReader(outputFilePath))) {
-	            String line;
-	            while ((line = reader.readLine()) != null) {
-	                System.out.println(line);
-	            }
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-	        
-	        deleteFilesInFolders(file_list);
-	        
-	    } catch (IOException | InterruptedException e) {
-	        e.printStackTrace();
-	    }
-	    
-        String filePath = currentDir + File.separator + "predictions.csv"; // predictions.csv 파일 경로 설정
-
-        Map<String, Integer> predictions = readPredictionsFromCSV(filePath);
-        
-        return predictions;
- 
-
-	}
-	
-	public void inference_result(Map<String, Integer> predictions) {
-        for (Map.Entry<String, Integer> entry : predictions.entrySet()) {
-            String id = entry.getKey();
-            int predictedClass = entry.getValue();
-
-            // 예측 결과 활용하여 원하는 작업 수행
-            // ...
-        }
+		peFile_Body_Extractor.extract_body(file_to_hex, file_to_hex_body);
 	}
 
-	// 악성코드 결과를 저장하는 함수
-//	public void save_malware_result(String packing_result, String unpacking_result, String malware, List malware_list){
-//		// 악성코드 종류를 저장한 리스트
-//		List<PEFile> peList
-//		// 패킹 탐지결과가 미탐 or 언 패킹이 실패했을 때 악성코드 탐지 결과는 불 필요하다
-//		if(packing_result.equals("???") || unpacking_result.equals("Fail")){
-//			malware_list.add("???");
-//			return;
-//		}
-//
-//		// 악성코드 결과확인
-//		if(mw.contains(malware)){
-//			malware_list.add(malware);
-//		}
-//		else{
-//			malware_list.add("X");
-//		}
-//	}
-
-	// 분석결과를 저장하는 함수
-	public void save_analysis_result(String packing_result, String unpacking_result, String malware_result,
-			List describe_list) {
-		// 패킹 결과
-		if (packing_result.equals("O")) {
-			// 언 패킹 결과
-			if (unpacking_result.equals("Sccuess")) {
-				// 악성코드 결과
-				String describe = malware_describe(malware_result);
-				describe_list.add(describe);
-			} else {
-				describe_list.add("언 패킹이 실패하여 정확한 악성코드 탐지가 어렵습니다.");
+	public void deleteFilesInFolders(String[] folders) {
+		for (String folderPath : folders) {
+			File folder = new File(folderPath);
+			if (folder.exists() && folder.isDirectory()) {
+				File[] files = folder.listFiles();
+				if (files != null) {
+					for (File file : files) {
+						if (file.isFile()) {
+							file.delete();
+						}
+					}
+				}
 			}
-		} else if (packing_result.equals("?")) {
-			describe_list.add("패킹 파일인지 확인이 어려워 정확한 악성코드 탐지가 어렵습니다.");
-		} else {
-			String describe = malware_describe(malware_result);
-			describe_list.add(describe);
 		}
 	}
 
-	// 악성코드 결과에 대한 설명을 저장하는 함수
-	public String malware_describe(String malware_result) {
-		switch (malware_result) {
-		case "Ramnit":
-			return "백도어를 통해 공격자가 원하는 정보를 전송하고 다수의 파일에 접근하여 악의적인 행위를 하는 악성코드입니다.";
-		case "Lollipop":
-			return "사용자의 동의 없이 광고를 클릭하도록 유도하여 수익을 얻는 행위를 수행하는 악성코드입니다.";
-		case "Kelihos_ver3":
-			return "Windows 운영체제를 대상으로 한 좀비 네트워크 구축 및 스팸 메일 전송 등의 악성 행위를 수행하는 트로이목마 바이러스입니다.";
-		case "Vundo":
-			return "Windows 운영체제에서 동작하는 백도어 트로이목마로, 광고 클릭 유도 및 개인정보 탈취 등의 악성 행위를 수행하는 악성코드입니다.";
-		case "Simda":
-			return "웹사이트 감염과 악성 파일 다운로드를 통해 컴퓨터에 침투하여 좀비 네트워크를 형성하고, 이를 이용한 악성코드 배포 및 개인정보 탈취 등의 악성 행위를 수행하는 트로이목마 바이러스입니다.";
-		case "Tracur":
-			return "웹사이트 감염 및 스팸 메일을 통해 사용자의 컴퓨터에 침투하여 온라인 금융 거래 정보를 탈취하거나 악성 광고를 보여주는 등의 악성 행위를 수행하는 트로이목마 바이러스입니다.";
-		case "Kelihos_ver1":
-			return "Windows 운영체제에서 동작하는 좀비 네트워크를 구축하여 스팸 메일 전송, DDoS 공격 등의 악성 행위를 수행하는 트로이목마 바이러스입니다.";
-		case "Obfuscator.ACY":
-			return "코드 난독화 기술을 사용하여 악성 코드를 숨기고 탐지를 회피하는 기능을 수행하는 트로이목마 바이러스입니다.";
-		case "Gatak":
-			return "유저의 웹 브라우저에서 정보를 탈취하여 백도어를 설치하거나 악성 광고를 보여주는 등의 악성 행위를 수행하는 트로이목마 바이러스";
-		default:
-			return "탐지된 악성코드가 없습니다.";
+	public Map<String, Integer> readPredictionsFromCSV(String filePath) {
+		Map<String, Integer> predictions = new HashMap<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line = reader.readLine(); // 헤더 라인 읽기
+			String[] headers = line.split(",");
+			int classCount = headers.length - 1;
+
+			while ((line = reader.readLine()) != null) {
+				String[] values = line.split(",");
+				String id = values[0];
+				int predictedClass = -1;
+
+				for (int i = 1; i < values.length; i++) {
+					int prediction = Integer.parseInt(values[i]);
+					if (prediction == 1) {
+						predictedClass = i;
+						break;
+					}
+				}
+
+				if (predictedClass != -1) {
+					predictions.put(id, predictedClass);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
+		return predictions;
 	}
 
-	// 업로드 파일 삭제 함수
-	public void deleteFileUpload(List deletelist) {
-		for (int i = 0; i < deletelist.size(); i++) {
-			File file = new File(deletelist.get(i).toString());
-			file.delete();
+	public Map<String, Integer> run_inference() {
+		try {
+			// 아나콘다 가상환경 실행
+			ProcessBuilder condaProcessBuilder = new ProcessBuilder("cmd.exe", "/c", "conda", "activate", "python_VM",
+					"&&", "cd", currentDir, "&&", "python", "main.py", file_to_hex, file_to_npy, save_file_path);
+			Process condaProcess = condaProcessBuilder.start();
+			condaProcess.waitFor();
+			System.out.println("conda activate");
+			deleteFilesInFolders(file_list);
+
+			// main.py의 출력 파일 경로
+			String outputFilePath = ".\\output.txt";
+
+			// 출력 파일을 읽어서 출력 확인
+			try (BufferedReader reader = new BufferedReader(new FileReader(outputFilePath))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					System.out.println(line);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		String filePath = currentDir + File.separator + "predictions.csv"; // predictions.csv 파일 경로 설정
+
+		Map<String, Integer> predictions = readPredictionsFromCSV(filePath);
+//        System.out.println(predictions);
+//        output : {EppManifest=6}
+
+		return predictions;
+
+	}
+
+	public void inference_result(Map<String, Integer> predictions) {
+
+		Map<Integer, String> malware_info_List = malware_info.getAllMalwareInfo();
+
+		for (Map.Entry<String, Integer> entry : predictions.entrySet()) {
+
+			String id = entry.getKey();
+			int predictedClass = entry.getValue();
+
+			for (predict_Result pr : predict_Results) {
+				System.out.println(pr.getFile_name());
+				System.out.println(id);
+				if (pr.getFile_name().equals(id)) {
+					for (Map.Entry<Integer, String> maps : malware_info_List.entrySet()) {
+						if (predictedClass == maps.getKey().intValue()) {
+							pr.setMalware_info(maps.getValue());
+							pr.setMalware_name(malware_info.values()[predictedClass].name());
+
+						}
+					}
+ 
+				}
+			}
+
 		}
 	}
 

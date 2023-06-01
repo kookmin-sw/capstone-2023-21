@@ -21,9 +21,9 @@ public enum PEFile {
     }
 
     public String getExtension() {
-        return extension;
+    	return extension;
     }
-
+    
     public static List<PEFile> getPEList() {
         PEFile[] peList = PEFile.values();
         List<PEFile> peFileList = Arrays.asList(peList);
